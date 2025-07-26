@@ -1,0 +1,53 @@
+generator client {
+  provider        = "prisma-client-ts"
+  output          = "../src/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id         String        @id @default(uuid())
+  name       String
+  email      String        @unique
+  balance    Decimal       @default(0.0)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  transactions Transaction[]
+}
+
+model Transaction {
+  id         String      @id @default(uuid())
+  user       User        @relation(fields: [userId], references: [id])
+  userId     String
+  trashType  TrashType
+  points     Int
+  status     Status      @default(PENDING)
+  createdAt  DateTime    @default(now())
+}
+
+enum TrashType {
+  PLASTIC
+  PAPER
+  METAL
+  ORGANIC
+  OTHER
+}
+
+enum Status {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// Virtual model for leaderboard (via query, not a physical table)
+/// Example Query in Prisma:
+/// prisma.transaction.groupBy({
+///   by: ['userId'],
+///   _sum: { points: true },
+///   orderBy: { _sum: { points: 'desc' } }
+/// })

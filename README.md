@@ -37,10 +37,11 @@ git clone https://github.com/zdnemz/GreenPay
 cd GreenPay
 ```
 
-### **2. Install dependencies**
+### **2. Installation and Setup**
 
 ```bash
 npm install
+npx prisma generate
 ```
 
 ### **3. Run the development server**
