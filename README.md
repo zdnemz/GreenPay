@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# **GreenPay**
 
-## Getting Started
+### _Turn Your Trash into Digital Balance for a Greener Future_
 
-First, run the development server:
+---
+
+## 🌱 **About GreenPay**
+
+**GreenPay** is an innovative platform that encourages people to exchange recyclable waste for digital balance. By combining **environmental awareness** with **fintech technology**, GreenPay creates a simple yet impactful way to reduce waste and reward positive behavior.
+
+---
+
+## 🚀 **Key Features**
+
+- ♻️ **Trash-to-Balance Exchange** – Convert your recyclable waste into digital points.
+- 💳 **Digital Wallet Integration** – Points can be stored as balance for future use.
+- 🏆 **Leaderboard & Rewards** – Compete with others and earn achievements.
+- 🔐 **Secure & Scalable** – Powered by **Next.js 15**, **Supabase**, and **Tailwind CSS**.
+
+---
+
+## 🛠 **Tech Stack**
+
+- **Frontend**: [Next.js 15](https://nextjs.org/) + [Tailwind CSS](https://tailwindcss.com/)
+- **Backend & Auth**: [Supabase](https://supabase.com/)
+- **Database**: Supabase PostgreSQL
+- **Other Tools**: QR Code validation, leaderboard
+
+---
+
+## 🔥 **Getting Started**
+
+### **1. Clone this repository**
+
+```bash
+git clone https://github.com/zdnemz/GreenPay
+cd GreenPay
+```
+
+### **2. Install dependencies**
+
+```bash
+npm install
+```
+
+### **3. Run the development server**
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📌 **Roadmap**
 
-## Learn More
+- [x] Project Initialization
+- [ ] Supabase setup & database schema
+- [ ] User authentication & QR Code validation
+- [ ] Wallet & transaction system
+- [ ] Leaderboard & reward system
+- [ ] Final polish & presentation
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🤝 **Contributing**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📄 **License**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is licensed under the MIT License – feel free to use and modify.
