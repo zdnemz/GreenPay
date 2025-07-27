@@ -1,6 +1,6 @@
 generator client {
-  provider        = "prisma-client-ts"
-  output          = "../src/generated/prisma"
+  provider = "prisma-client-ts"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -10,24 +10,40 @@ datasource db {
 }
 
 model User {
-  id         String        @id @default(uuid())
-  name       String
-  email      String        @unique
-  balance    Decimal       @default(0.0)
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
+  id           String         @id @default(uuid())
+  name         String
+  email        String         @unique
+  balance      Decimal        @default(0.0)
+  role         Role           @default(USER)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 
-  transactions Transaction[]
+  // Relation
+  transactions Transaction[]  @relation("UserTransactions")
+  handled     Transaction[]   @relation("PetugasTransactions")
 }
 
 model Transaction {
-  id         String      @id @default(uuid())
-  user       User        @relation(fields: [userId], references: [id])
+  id         String     @id @default(uuid())
+  
+  // Relation to User
+  user       User       @relation("UserTransactions", fields: [userId], references: [id])
   userId     String
+
+  // Relation to Petugas
+  petugas    User?      @relation("PetugasTransactions", fields: [petugasId], references: [id])
+  petugasId  String?
+
   trashType  TrashType
   points     Int
-  status     Status      @default(PENDING)
-  createdAt  DateTime    @default(now())
+  status     Status     @default(PENDING)
+  createdAt  DateTime   @default(now())
+}
+
+enum Role {
+  USER
+  PETUGAS
+  ADMIN
 }
 
 enum TrashType {
@@ -43,11 +59,3 @@ enum Status {
   APPROVED
   REJECTED
 }
-
-// Virtual model for leaderboard (via query, not a physical table)
-/// Example Query in Prisma:
-/// prisma.transaction.groupBy({
-///   by: ['userId'],
-///   _sum: { points: true },
-///   orderBy: { _sum: { points: 'desc' } }
-/// })
