@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <>
       {header && (
-        <header className={cn("fixed z-50 w-full py-3", DEFAULT_PADDING)}>
+        <header className={cn("fixed z-50 w-full *:py-3", DEFAULT_PADDING)}>
           {header}
         </header>
       )}

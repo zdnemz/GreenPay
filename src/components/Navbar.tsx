@@ -15,7 +15,7 @@ const isAuthenticated = true;
 
 export default function Navbar() {
   return (
-    <div className="flex w-full items-center justify-between">
+    <div className="bg-sidebar flex w-full items-center justify-between">
       {/* Logo */}
       <div>
         <h1 className="text-2xl font-semibold">
@@ -30,17 +30,17 @@ export default function Navbar() {
 
       {/* Navigation List */}
       <nav>
-        <ul className="flex items-center justify-center space-x-6">
-          <li>
+        <ul className="flex items-center justify-center space-x-12 text-sm">
+          <li className="hover:text-primary transition-colors">
             <Link href="/">Beranda</Link>
           </li>
-          <li>
+          <li className="hover:text-primary transition-colors">
             <Link href="/how-it-works">Cara Kerja</Link>
           </li>
-          <li>
+          <li className="hover:text-primary transition-colors">
             <Link href="/leaderboard">Leaderboard</Link>
           </li>
-          <li>
+          <li className="hover:text-primary transition-colors">
             <Link href="/about">Tentang Kami</Link>
           </li>
         </ul>
@@ -82,11 +82,7 @@ function NavbarAction({
           {/* Authenticated Action */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                aria-label="Menu Profil"
-                className="cursor-pointer"
-              >
+              <Button aria-label="Menu Profil" className="cursor-pointer">
                 Profile
               </Button>
             </DropdownMenuTrigger>
