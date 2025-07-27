@@ -52,7 +52,7 @@
   --popover: #ffffff;
   --popover-foreground: #2d2d2d;
 
-  --primary: #39ff14; /* ✅ Neon green lebih kontras */
+  --primary: #39ff14;
   --primary-foreground: #1a1a1a;
 
   --secondary: #2d2d2d;
@@ -61,14 +61,14 @@
   --muted: #e0e0e0;
   --muted-foreground: #4d4d4d;
 
-  --accent: #39ff14; /* ✅ Disamakan dengan primary */
+  --accent: #39ff14;
   --accent-foreground: #1a1a1a;
 
   --destructive: #ff4c4c;
 
   --border: #cccccc;
   --input: #dddddd;
-  --ring: #39ff14; /* ✅ Neon ring */
+  --ring: #39ff14;
 
   --chart-1: #39ff14;
   --chart-2: #66ff33;

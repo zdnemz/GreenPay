@@ -1,13 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { useTheme } from "next-themes";
 
 import RootLayout from "@/components/layouts/RootLayout";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 import Hero from "@/components/pages/home/hero";
+import HowItWorks from "@/components/pages/home/howItWorks";
 
 export default function Home() {
   return (
@@ -17,6 +17,7 @@ export default function Home() {
       footer={<Footer />}
     >
       <Hero />
+      <HowItWorks />
     </RootLayout>
   );
 }

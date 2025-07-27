@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 
 export default function Hero() {
   return (
-    <section className="grid min-h-screen grid-cols-1 items-center gap-y-24 md:grid-cols-[2fr_1fr]">
+    <section className="grid min-h-screen grid-cols-1 items-center gap-x-6 gap-y-12 md:grid-cols-[2fr_1fr]">
       {/* Text */}
       <div className="space-y-3">
         <div className="space-y-1">
@@ -21,13 +21,16 @@ export default function Hero() {
             saldo digitalmu langsung dari smartphone.
           </p>
         </div>
-        <Button size="lg" className="shadow-foreground cursor-pointer shadow">
+        <Button
+          size="lg"
+          className="relative cursor-pointer bg-[length:200%_200%] shadow transition-all duration-300 [background:linear-gradient(270deg,#4CAF50,#7CFC00,#A2FF00,#C6FF00)] hover:shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]"
+        >
           Mulai Sekarang
         </Button>
       </div>
 
       {/* Icon */}
-      <div className="flex justify-end">
+      <div className="flex justify-center md:justify-end">
         <AnimatedPath />
       </div>
     </section>
@@ -38,7 +41,7 @@ function AnimatedPath() {
   return (
     <motion.svg
       viewBox="0 0 250 250"
-      className="h-64 w-64 rounded-xl"
+      className="min-h-64 max-w-sm min-w-64 rounded-xl"
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
     >
