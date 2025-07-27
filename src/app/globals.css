@@ -40,8 +40,9 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 }
+
 :root {
-  --radius: 0.625rem;
+  --radius: 1.5rem;
 
   --background: #f5f5f5;
   --foreground: #2d2d2d;
@@ -51,7 +52,7 @@
   --popover: #ffffff;
   --popover-foreground: #2d2d2d;
 
-  --primary: #7cfc00;
+  --primary: #39ff14; /* ✅ Neon green lebih kontras */
   --primary-foreground: #1a1a1a;
 
   --secondary: #2d2d2d;
@@ -60,29 +61,29 @@
   --muted: #e0e0e0;
   --muted-foreground: #4d4d4d;
 
-  --accent: #7cfc00;
+  --accent: #39ff14; /* ✅ Disamakan dengan primary */
   --accent-foreground: #1a1a1a;
 
   --destructive: #ff4c4c;
 
   --border: #cccccc;
   --input: #dddddd;
-  --ring: #7cfc00;
+  --ring: #39ff14; /* ✅ Neon ring */
 
-  --chart-1: #7cfc00;
-  --chart-2: #a6ff4d;
-  --chart-3: #bfff80;
-  --chart-4: #99e600;
-  --chart-5: #66cc00;
+  --chart-1: #39ff14;
+  --chart-2: #66ff33;
+  --chart-3: #99ff66;
+  --chart-4: #33e600;
+  --chart-5: #00cc44;
 
   --sidebar: #f5f5f5;
   --sidebar-foreground: #2d2d2d;
-  --sidebar-primary: #7cfc00;
+  --sidebar-primary: #39ff14;
   --sidebar-primary-foreground: #1a1a1a;
   --sidebar-accent: #e0e0e0;
   --sidebar-accent-foreground: #2d2d2d;
   --sidebar-border: #cccccc;
-  --sidebar-ring: #7cfc00;
+  --sidebar-ring: #39ff14;
 }
 
 .dark {

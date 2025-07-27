@@ -9,14 +9,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import GreenPayIcon from "./icons/GreenPay";
+import ToggleTheme from "./ToggleTheme";
 
 // dummy state
 const isAuthenticated = true;
 
 export default function Navbar() {
   return (
-    <div className="bg-sidebar flex w-full items-center justify-between">
-      {/* Logo */}
+    <div className="bg-sidebar flex w-full items-center justify-between border-b">
       <div>
         <h1 className="text-2xl font-semibold">
           <Link href="/" className="flex items-center justify-center gap-x-1">
@@ -48,6 +48,7 @@ export default function Navbar() {
 
       {/* Action Button */}
       <div className="flex items-center space-x-3">
+        <ToggleTheme />
         <NavbarAction isAuthenticated={isAuthenticated} />
       </div>
     </div>

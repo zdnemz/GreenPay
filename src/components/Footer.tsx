@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 
 export default function Footer() {
   return (
-    <footer className="bg-background mt-10 border-t">
+    <footer className="bg-sidebar mt-10 border-t">
       <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-6 py-10 md:grid-cols-3">
         {/* Logo & Description */}
         <div className="space-y-3">
