@@ -57,7 +57,7 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 ## 📌 **Roadmap**
 
 - [x] Project Initialization
-- [ ] Supabase setup & database schema
+- [x] Supabase setup & database schema
 - [ ] User authentication & QR Code validation
 - [ ] Wallet & transaction system
 - [ ] Leaderboard & reward system
