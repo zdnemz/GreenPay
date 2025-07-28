@@ -1,4 +1,4 @@
-import response from "@/lib/response";
+import { response } from "@/lib/response";
 import { validate } from "@/lib/validate";
 import { exampleSchema } from "@/schemas/main-schema";
 

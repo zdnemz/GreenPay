@@ -17,7 +17,7 @@ const defaultMessages: Record<number, string> = {
   500: "Internal Server Error",
 };
 
-export default function response<T>(status: number, data?: T | null) {
+export function response<T>(status: number, data?: T | null) {
   const success = status >= 200 && status < 300;
 
   const message = defaultMessages[status] || (success ? "Success" : "Error");
