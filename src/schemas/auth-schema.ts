@@ -22,3 +22,14 @@ export const loginSchema = z.object({
   email: z.email("Format email tidak valid"),
   password: z.string().min(1, "Password tidak boleh kosong"),
 });
+
+export const changePasswordSchema = z
+  .object({
+    oldPassword: z.string().min(6, "Password lama wajib diisi"),
+    newPassword: z.string().min(6, "Password baru minimal 6 karakter"),
+    confirmNewPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmNewPassword, {
+    message: "Konfirmasi password baru tidak cocok",
+    path: ["confirmNewPassword"],
+  });

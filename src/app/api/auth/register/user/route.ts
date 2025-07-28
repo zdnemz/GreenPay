@@ -1,12 +1,10 @@
 import { NextRequest } from "next/server";
 import bcrypt from "bcryptjs";
-
 import { response } from "@/lib/response";
 import { db } from "@/lib/db";
 import { validate } from "@/lib/validate";
 import { APP_ENV } from "@/lib/config";
 import { signToken } from "@/lib/jwt";
-
 import { registerSchema } from "@/schemas/auth-schema";
 
 export async function POST(req: NextRequest) {
