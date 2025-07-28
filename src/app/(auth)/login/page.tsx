@@ -30,10 +30,12 @@ import { loginSchema } from "@/schemas/auth-schema";
 import { toast } from "sonner";
 import { ApiResponse } from "@/lib/response";
 import Link from "next/link";
+import { useAuthStore } from "@/store/auth-store";
+import { withGuest } from "@/hoc/withAuth";
 
-export default function Login() {
+export default withGuest(function () {
   const [isPending, startTransition] = React.useTransition();
-  const [loading, setLoading] = React.useState(false);
+  const { setLoading } = useAuthStore();
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -138,4 +140,4 @@ export default function Login() {
       </div>
     </RootLayout>
   );
-}
+});

@@ -12,13 +12,13 @@ import {
 import GreenPayIcon from "./icons/GreenPay";
 import ToggleTheme from "./ToggleTheme";
 import { Menu, X } from "lucide-react";
-
-// dummy state
-const isAuthenticated = true;
+import { useAuthStore } from "@/store/auth-store";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [tolerancePadding, setTolerancePadding] = React.useState(0);
+
+  const { isAuthenticated } = useAuthStore();
 
   React.useEffect(() => {
     if (isMenuOpen) {
