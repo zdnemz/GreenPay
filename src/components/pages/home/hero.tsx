@@ -23,7 +23,7 @@ export default function Hero() {
         </div>
         <Button
           size="lg"
-          className="relative cursor-pointer bg-[length:200%_200%] shadow transition-all duration-300 [background:linear-gradient(270deg,#4CAF50,#7CFC00,#A2FF00,#C6FF00)] hover:shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]"
+          className="relative cursor-pointer bg-[linear-gradient(270deg,var(--chart-1),var(--chart-2),var(--chart-3),var(--chart-4))] bg-[length:200%_200%] shadow transition-all duration-300 hover:shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]"
         >
           Mulai Sekarang
         </Button>
