@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import Hero from "@/components/pages/home/hero";
 import HowItWorks from "@/components/pages/home/howItWorks";
 import WhyUs from "@/components/pages/home/whyUs";
+import CTA from "@/components/pages/home/cta";
 
 export default function Home() {
   return (
@@ -20,6 +21,7 @@ export default function Home() {
       <Hero />
       <HowItWorks />
       <WhyUs />
+      <CTA />
     </RootLayout>
   );
 }
