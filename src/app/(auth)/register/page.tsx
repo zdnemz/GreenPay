@@ -5,7 +5,7 @@ import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 import RootLayout from "@/components/layouts/RootLayout";
 
@@ -30,12 +30,14 @@ import { registerSchema } from "@/schemas/auth-schema";
 import { toast } from "sonner";
 import { ApiResponse } from "@/lib/response";
 import Link from "next/link";
-import { useAuthStore } from "@/store/auth-store";
-import { withGuest } from "@/hoc/withAuth";
+import { useAuthStore, User } from "@/store/auth-store";
+import { useRouter } from "next/navigation";
 
-export default withGuest(function () {
+export default function Register() {
   const [isPending, startTransition] = React.useTransition();
-  const { setLoading } = useAuthStore();
+  const { setLoading, setUser } = useAuthStore();
+
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -62,10 +64,15 @@ export default withGuest(function () {
           return;
         }
 
+        await setUser(data.data as User);
+
         toast.success("register sukses! Mengarahkan...");
+        router.push("/dashboard");
       } catch (error) {
-        console.error("register error:", error);
-        toast.error("Terjadi Kesalahan");
+        if (error instanceof AxiosError) {
+          console.error("register error:", error);
+          toast.error((error.response?.data as ApiResponse).error as string);
+        }
       } finally {
         setLoading(false);
       }
@@ -175,4 +182,4 @@ export default withGuest(function () {
       </div>
     </RootLayout>
   );
-});
+}

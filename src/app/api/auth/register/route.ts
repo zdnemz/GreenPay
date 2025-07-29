@@ -39,6 +39,9 @@ export async function POST(req: NextRequest) {
       },
       select: {
         id: true,
+        name: true,
+        email: true,
+        role: true,
       },
     });
 
@@ -46,7 +49,13 @@ export async function POST(req: NextRequest) {
     const token = signToken(newUser.id);
 
     // kembalikan response dengan cookies
-    const res = response(201, "Login berhasil");
+    const res = response(201, {
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+      role: newUser.role,
+    });
+
     res.cookies.set({
       name: "auth-token",
       value: token,

@@ -1,36 +1,22 @@
 import { db } from "@/lib/db";
 import { verifyToken } from "@/lib/jwt";
 import { response } from "@/lib/response";
-import { NextRequest } from "next/server";
 import { getUserFromSession } from "@/lib/auth";
+import { NextRequest } from "next/server";
 
-export async function GET(req: NextRequest) {
-  const auth_token = req.cookies.get("auth-token")?.value;
+export async function GET() {
+  try {
+    const user = await getUserFromSession();
 
-  if (!auth_token) {
-    const res = response(401, "Tidak terautentikasi");
-    res.cookies.delete("auth-token");
+    if (!user) {
+      return response(401, "Tidak terautentikasi");
+    }
 
-    return res;
+    return response(200, user);
+  } catch (_err) {
+    console.error(`error : ${(_err as Error).message}`);
+    return response(500, "Terjadi kesalahan server");
   }
-
-  const payload = verifyToken(auth_token);
-
-  // jika tidak ada payload atau tidak terverifikasi
-  if (!payload) {
-    const res = response(401, "Tidak terautentikasi");
-    res.cookies.delete("auth-token");
-
-    return res;
-  }
-
-  const user = await getUserFromSession();
-
-  if (!user) {
-    return response(404, "Pengguna tidak ditemukan");
-  }
-
-  return response(200, user);
 }
 
 export async function PUT(req: NextRequest) {
@@ -39,22 +25,32 @@ export async function PUT(req: NextRequest) {
     if (!token) return response(401, "Unauthorized");
 
     const session = verifyToken(token);
-    const body = await req.json();
+    if (!session) return response(401, "Invalid token");
 
+    const body = await req.json();
     const { name, email } = body;
 
+    // Validasi input
+    if (!name || !email) {
+      return response(400, "Name and email are required");
+    }
+
     const updatedUser = await db.user.update({
-      where: { id: session?.userId },
+      where: { id: session.userId },
       data: {
         name,
         email,
       },
-      select: { id: true, name: true, email: true },
+      select: { id: true, name: true, email: true, role: true, balance: true },
     });
 
-    return response(200, "Data berhasil diubah : " + updatedUser.name);
-  } catch (err) {
-    return response(500, `Server error : ${err}`);
+    return response(200, {
+      message: "Data berhasil diubah",
+      user: updatedUser,
+    });
+  } catch (_err) {
+    console.error("Error updating user:", _err);
+    return response(500, "Server error");
   }
 }
 
@@ -64,10 +60,11 @@ export async function DELETE(req: NextRequest) {
     if (!token) return response(401, "Unauthorized");
 
     const session = verifyToken(token);
+    if (!session) return response(401, "Invalid token");
 
-    await db.user.delete({ where: { id: session?.userId } });
+    await db.user.delete({ where: { id: session.userId } });
 
-    // hapus cookie
+    // Hapus cookie
     const res = response(200, "Akun berhasil dihapus");
     res.cookies.set({
       name: "auth-token",
@@ -76,7 +73,8 @@ export async function DELETE(req: NextRequest) {
     });
 
     return res;
-  } catch (err) {
-    return response(500, `Server error : ${err}`);
+  } catch (_err) {
+    console.error("Error deleting user:", _err);
+    return response(500, "Server error");
   }
 }

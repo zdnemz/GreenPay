@@ -13,12 +13,48 @@ import GreenPayIcon from "./icons/GreenPay";
 import ToggleTheme from "./ToggleTheme";
 import { Menu, X } from "lucide-react";
 import { useAuthStore } from "@/store/auth-store";
+import axios, { AxiosError } from "axios";
+import { toast } from "sonner";
+import { ApiResponse } from "@/lib/response";
+import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "./ui/dialog";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [tolerancePadding, setTolerancePadding] = React.useState(0);
 
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, clearUser } = useAuthStore();
+
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      const { data }: { data: ApiResponse } =
+        await axios.delete("/api/auth/logout");
+
+      if (!data.success) {
+        toast.error((data.error as string) || "Terjadi kesalahan");
+      }
+
+      await clearUser();
+
+      router.push("/");
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        console.error("register error:", error);
+        toast.error((error.response?.data as ApiResponse).error as string);
+      }
+    }
+  };
 
   React.useEffect(() => {
     if (isMenuOpen) {
@@ -72,7 +108,10 @@ export default function Navbar() {
       <div className="flex items-center space-x-3">
         <ToggleTheme />
         <div className="hidden lg:flex">
-          <NavbarAction isAuthenticated={isAuthenticated} />
+          <NavbarAction
+            onLogout={handleLogout}
+            isAuthenticated={isAuthenticated}
+          />
         </div>
 
         {/* Hamburger (Mobile Only) */}
@@ -88,7 +127,7 @@ export default function Navbar() {
       {/* Fullscreen Modal Menu */}
       {isMenuOpen && (
         <div
-          className="bg-sidebar fixed inset-0 z-50 *:px-6 *:sm:px-12 *:md:px-24"
+          className="bg-sidebar fixed inset-0 z-50 block *:px-6 *:sm:px-12 *:md:px-24 lg:hidden"
           style={{ paddingRight: `${tolerancePadding}px` }}
         >
           {/* Header Mobile Modal */}
@@ -151,6 +190,7 @@ export default function Navbar() {
 
             <div className="border-t pt-4">
               <MobileProfileMenu
+                onLogout={handleLogout}
                 isAuthenticated={isAuthenticated}
                 onClose={() => setIsMenuOpen(false)}
               />
@@ -167,7 +207,7 @@ function NavbarAction({
   onLogout,
 }: {
   isAuthenticated: boolean;
-  onLogout?: () => void;
+  onLogout: () => void;
 }) {
   return (
     <div className="flex items-center space-x-3">
@@ -192,16 +232,54 @@ function NavbarAction({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="p-3" align="end">
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem asChild className="cursor-pointer">
               <Link href="/dashboard">Dashboard</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem asChild className="cursor-pointer">
               <Link href="/transactions">Riwayat Transaksi</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive" onClick={onLogout}>
-              Keluar
-            </DropdownMenuItem>
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <DropdownMenuItem
+                  onSelect={(e) => {
+                    e.preventDefault();
+                  }}
+                  variant="destructive"
+                  className="cursor-pointer"
+                >
+                  Keluar
+                </DropdownMenuItem>
+              </DialogTrigger>
+
+              <DialogContent className="sm:max-w-[400px]">
+                <DialogHeader>
+                  <DialogTitle>Keluar dari akun?</DialogTitle>
+                  <DialogDescription>
+                    Apakah kamu yakin ingin keluar? Kamu harus login lagi untuk
+                    mengakses dashboard.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <DialogFooter className="pt-4">
+                  <DialogClose asChild>
+                    <Button variant="outline" className="cursor-pointer">
+                      Batal
+                    </Button>
+                  </DialogClose>
+                  <DialogClose asChild>
+                    <Button
+                      variant="destructive"
+                      onClick={onLogout}
+                      className="cursor-pointer"
+                    >
+                      Ya, Keluar
+                    </Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </DropdownMenuContent>
         </DropdownMenu>
       )}
@@ -216,7 +294,7 @@ function MobileProfileMenu({
 }: {
   isAuthenticated: boolean;
   onClose: () => void;
-  onLogout?: () => void;
+  onLogout: () => void;
 }) {
   if (!isAuthenticated) {
     return (
@@ -251,16 +329,38 @@ function MobileProfileMenu({
       >
         Riwayat Transaksi
       </Link>
-      <Button
-        variant="destructive"
-        className="w-full"
-        onClick={() => {
-          onLogout?.();
-          onClose();
-        }}
-      >
-        Keluar
-      </Button>
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button variant="destructive" className="w-full cursor-pointer">
+            Keluar
+          </Button>
+        </DialogTrigger>
+
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Keluar dari akun?</DialogTitle>
+            <DialogDescription>
+              Apakah kamu yakin ingin keluar? Kamu harus login lagi untuk
+              mengakses dashboard.
+            </DialogDescription>
+          </DialogHeader>
+
+          <DialogFooter className="pt-4">
+            <DialogClose asChild>
+              <Button variant="outline" className="cursor-pointer">
+                Batal
+              </Button>
+            </DialogClose>
+            <Button
+              variant="destructive"
+              onClick={onLogout}
+              className="cursor-pointer"
+            >
+              Ya, Keluar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

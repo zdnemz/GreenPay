@@ -10,10 +10,10 @@ export interface AuthProviderProps {
 }
 
 export default function AuthProvider({ children }: AuthProviderProps) {
-  const { isInitialized } = useAuthStore();
+  const { isInitialized, loading } = useAuthStore();
   useAuthCheck();
 
-  if (!isInitialized) {
+  if (!isInitialized || loading) {
     return <Loading />;
   }
 
