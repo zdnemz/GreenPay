@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { NextRequest } from "next/server";
 import { getUserFromSession } from "@/lib/auth";
 import { response } from "@/lib/response";
+import { Role } from "@/generated/prisma/client";
 
 export async function GET(
   _req: NextRequest,
@@ -14,7 +15,7 @@ export async function GET(
       return response(401, "Unauthorized");
     }
 
-    const { id } = await params; // Fix: await params
+    const { id } = await params;
 
     const user = await db.user.findUnique({
       where: { id },
@@ -49,17 +50,20 @@ export async function PUT(
   }
 
   try {
-    const { id } = await params; // Fix: await params
+    const { id } = await params;
     const { role } = await req.json();
 
     if (!role) {
       return response(400, "Field role wajib diisi");
     }
 
-    // Validasi role yang diizinkan
-    const allowedRoles = ["ADMIN", "PETUGAS", "USER"];
+    const allowedRoles = Object.values(Role);
+
     if (!allowedRoles.includes(role)) {
-      return response(400, "Role tidak valid");
+      return response(
+        400,
+        `Role tidak valid. Hanya bisa: ${allowedRoles.join(", ")}`,
+      );
     }
 
     const updatedUser = await db.user.update({
@@ -92,19 +96,34 @@ export async function DELETE(
   }
 
   try {
-    const { id } = await params; // Fix: await params
+    const { id } = await params;
 
     const user = await db.user.findUnique({ where: { id } });
 
     if (!user) {
-      return response(404, "User not found");
+      return response(404, "User tidak di temukan");
     }
 
-    if (user.role !== "USER") {
-      return response(403, "Hanya user biasa yang bisa dihapus");
+    // Validasi role yang bisa dihapus dengan query dari database
+    const deletableRoles = await db.user.findMany({
+      select: { role: true },
+      distinct: ["role"],
+      where: {
+        role: {
+          not: "ADMIN", // Tidak bisa hapus ADMIN
+        },
+      },
+    });
+
+    const allowedDeletableRoles = deletableRoles.map((u) => u.role);
+
+    if (!allowedDeletableRoles.includes(user.role)) {
+      return response(
+        403,
+        `Hanya user dengan role: ${allowedDeletableRoles.join(", ")} yang bisa dihapus`,
+      );
     }
 
-    // Hapus user
     await db.user.delete({ where: { id } });
 
     return response(200, "User berhasil dihapus");

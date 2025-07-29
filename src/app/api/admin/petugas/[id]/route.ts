@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { response } from "@/lib/response";
 import { getUserFromSession } from "@/lib/auth";
+import { Role } from "@/generated/prisma/client";
 
 export async function GET(
   _: NextRequest,
@@ -14,7 +15,7 @@ export async function GET(
   }
 
   try {
-    const { id } = await params; // Await params untuk Next.js 15
+    const { id } = await params;
 
     const petugas = await db.user.findFirst({
       where: {
@@ -51,17 +52,21 @@ export async function PUT(
   }
 
   try {
-    const { id } = await params; // Await params untuk Next.js 15
+    const { id } = await params;
     const { role } = await req.json();
 
     if (!role) {
       return response(400, "Role wajib diisi");
     }
 
-    // Validasi role yang diizinkan
-    const allowedRoles = ["ADMIN", "PETUGAS", "USER"];
+    // Validasi role dengan mengambil dari Prisma
+    const allowedRoles = Object.values(Role);
+
     if (!allowedRoles.includes(role)) {
-      return response(400, "Role tidak valid");
+      return response(
+        400,
+        `Role tidak valid. Hanya bisa: ${allowedRoles.join(", ")}`,
+      );
     }
 
     const updated = await db.user.update({
@@ -94,16 +99,35 @@ export async function DELETE(
   }
 
   try {
-    const { id } = await params; // Await params untuk Next.js 15
+    const { id } = await params;
 
     // Cek apakah user yang akan dihapus adalah petugas
     const existingUser = await db.user.findFirst({
       where: { id, role: "PETUGAS" },
-      select: { id: true, name: true },
+      select: { id: true, name: true, role: true },
     });
 
     if (!existingUser) {
       return response(404, "Petugas tidak ditemukan");
+    }
+
+    const deletableRoles = await db.user.findMany({
+      select: { role: true },
+      distinct: ["role"],
+      where: {
+        role: {
+          not: "ADMIN",
+        },
+      },
+    });
+
+    const allowedDeletableRoles = deletableRoles.map((u) => u.role);
+
+    if (!allowedDeletableRoles.includes(existingUser.role)) {
+      return response(
+        403,
+        `Hanya user dengan role: ${allowedDeletableRoles.join(", ")} yang bisa dihapus`,
+      );
     }
 
     // Hapus user
