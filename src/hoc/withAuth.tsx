@@ -18,7 +18,7 @@ export const withAuth = <P extends object>(
   roles?: User["role"][],
 ) => {
   return function AuthenticatedComponent(props: P) {
-    const { isAuthenticated, isInitialized, user } = useAuthStore();
+    const { isAuthenticated, isInitialized, loading, user } = useAuthStore();
     const router = useRouter();
     const [redirecting, setRedirecting] = useState(false);
 
@@ -29,7 +29,7 @@ export const withAuth = <P extends object>(
       }
     }, [isInitialized, isAuthenticated, router]);
 
-    if (!isInitialized || redirecting) return <Loading />;
+    if (!isInitialized || redirecting || loading) return <Loading />;
 
     if (roles && (!user?.role || !roles.includes(user.role))) {
       return (
@@ -63,7 +63,7 @@ export const withGuest = <P extends object>(
   redirectTo: string = "/",
 ) => {
   return function GuestComponent(props: P) {
-    const { isAuthenticated, isInitialized } = useAuthStore();
+    const { isAuthenticated, isInitialized, loading } = useAuthStore();
     const router = useRouter();
     const [redirecting, setRedirecting] = useState(false);
 
@@ -74,7 +74,7 @@ export const withGuest = <P extends object>(
       }
     }, [isAuthenticated, isInitialized, router]);
 
-    if (!isInitialized || redirecting) return <Loading />;
+    if (!isInitialized || redirecting || loading) return <Loading />;
 
     if (isAuthenticated) {
       return <NotFound />;

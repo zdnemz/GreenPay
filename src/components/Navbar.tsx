@@ -232,16 +232,23 @@ function NavbarAction({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="p-3" align="end">
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem asChild className="cursor-pointer">
               <Link href="/dashboard">Dashboard</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem asChild className="cursor-pointer">
               <Link href="/transactions">Riwayat Transaksi</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
+
             <Dialog>
               <DialogTrigger asChild>
-                <DropdownMenuItem variant="destructive" onClick={onLogout}>
+                <DropdownMenuItem
+                  onSelect={(e) => {
+                    e.preventDefault();
+                  }}
+                  variant="destructive"
+                  className="cursor-pointer"
+                >
                   Keluar
                 </DropdownMenuItem>
               </DialogTrigger>
@@ -257,16 +264,19 @@ function NavbarAction({
 
                 <DialogFooter className="pt-4">
                   <DialogClose asChild>
-                    <Button variant="outline">Batal</Button>
+                    <Button variant="outline" className="cursor-pointer">
+                      Batal
+                    </Button>
                   </DialogClose>
-                  <Button
-                    variant="destructive"
-                    onClick={() => {
-                      onLogout?.(); // Trigger logout logic dari parent
-                    }}
-                  >
-                    Ya, Keluar
-                  </Button>
+                  <DialogClose asChild>
+                    <Button
+                      variant="destructive"
+                      onClick={onLogout}
+                      className="cursor-pointer"
+                    >
+                      Ya, Keluar
+                    </Button>
+                  </DialogClose>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -321,7 +331,7 @@ function MobileProfileMenu({
       </Link>
       <Dialog>
         <DialogTrigger asChild>
-          <Button variant="destructive" className="w-full">
+          <Button variant="destructive" className="w-full cursor-pointer">
             Keluar
           </Button>
         </DialogTrigger>
@@ -337,13 +347,14 @@ function MobileProfileMenu({
 
           <DialogFooter className="pt-4">
             <DialogClose asChild>
-              <Button variant="outline">Batal</Button>
+              <Button variant="outline" className="cursor-pointer">
+                Batal
+              </Button>
             </DialogClose>
             <Button
               variant="destructive"
-              onClick={() => {
-                onLogout();
-              }}
+              onClick={onLogout}
+              className="cursor-pointer"
             >
               Ya, Keluar
             </Button>

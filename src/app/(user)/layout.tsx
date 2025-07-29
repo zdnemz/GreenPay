@@ -2,18 +2,12 @@
 
 import * as React from "react";
 
-// import { withAuth } from "@/hoc/withAuth";
+import { withAuth } from "@/hoc/withAuth";
 
-// export default withAuth(
-//   function ({ children }: Readonly<{ children: React.ReactNode }>) {
-//     return children;
-//   },
-//   undefined,
-//   ["ADMIN", "USER"],
-// );
-
-export default function Layout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
-  return children;
-}
+export default withAuth(
+  function ({ children }: Readonly<{ children: React.ReactNode }>) {
+    return children;
+  },
+  undefined,
+  ["ADMIN", "USER"],
+);

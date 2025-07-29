@@ -31,10 +31,9 @@ import { toast } from "sonner";
 import { ApiResponse } from "@/lib/response";
 import Link from "next/link";
 import { useAuthStore, User } from "@/store/auth-store";
-import { withGuest } from "@/hoc/withAuth";
 import { useRouter } from "next/navigation";
 
-export default withGuest(function () {
+export default function Register() {
   const [isPending, startTransition] = React.useTransition();
   const { setLoading, setUser } = useAuthStore();
 
@@ -183,4 +182,4 @@ export default withGuest(function () {
       </div>
     </RootLayout>
   );
-});
+}

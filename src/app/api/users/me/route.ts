@@ -4,39 +4,43 @@ import { response } from "@/lib/response";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
-  const auth_token = req.cookies.get("auth-token")?.value;
+  try {
+    const auth_token = req.cookies.get("auth-token")?.value;
 
-  if (!auth_token) {
-    const res = response(401, "Tidak terautentikasi");
-    res.cookies.delete("auth-token");
+    if (!auth_token) {
+      const res = response(401, "Tidak terautentikasi");
+      res.cookies.delete("auth-token");
 
-    return res;
+      return res;
+    }
+
+    const payload = verifyToken(auth_token);
+
+    if (!payload) {
+      const res = response(401, "Tidak terautentikasi");
+      res.cookies.delete("auth-token");
+
+      return res;
+    }
+
+    const user = await db.user.findUnique({
+      where: { id: payload.userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+      },
+    });
+
+    if (!user) {
+      return response(404, "Pengguna tidak ditemukan");
+    }
+
+    return response(200, user);
+  } catch (err) {
+    console.error(`error : ${(err as Error).message}`);
   }
-
-  const payload = verifyToken(auth_token);
-
-  if (!payload) {
-    const res = response(401, "Tidak terautentikasi");
-    res.cookies.delete("auth-token");
-
-    return res;
-  }
-
-  const user = await db.user.findUnique({
-    where: { id: payload.userId },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-    },
-  });
-
-  if (!user) {
-    return response(404, "Pengguna tidak ditemukan");
-  }
-
-  return response(200, user);
 }
 
 export async function PUT(req: NextRequest) {
@@ -60,7 +64,7 @@ export async function PUT(req: NextRequest) {
 
     return response(200, "Data berhasil diubah : " + updatedUser.name);
   } catch (err) {
-    return response(500, "Server error");
+    console.error(`error : ${(err as Error).message}`);
   }
 }
 
@@ -83,6 +87,6 @@ export async function DELETE(req: NextRequest) {
 
     return res;
   } catch (err) {
-    return response(500, "Server error");
+    console.error(`error : ${(err as Error).message}`);
   }
 }
