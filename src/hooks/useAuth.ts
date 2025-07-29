@@ -2,15 +2,22 @@
 
 import * as React from "react";
 import axios, { AxiosError } from "axios";
-import { useRouter } from "next/navigation";
-
+import { useRouter, usePathname  } from "next/navigation";
 import { useAuthStore, User } from "@/store/auth-store";
 import { ApiResponse } from "@/lib/response";
 
 export const useAuthCheck = () => {
+  const pathname = usePathname();
   const { setUser, clearUser, setLoading, setInitialized } = useAuthStore();
 
   React.useEffect(() => {
+    const publicRoutes = ["/", "/login", "/register"];
+
+    if (publicRoutes.includes(pathname)) {
+      setInitialized(true);
+      return;
+    }
+    
     const checkAuthStatus = async () => {
       try {
         setLoading(true);
