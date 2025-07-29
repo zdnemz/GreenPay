@@ -6,10 +6,10 @@ import RootLayout from "@/components/layouts/RootLayout";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-import Hero from "@/components/pages/home/hero";
-import HowItWorks from "@/components/pages/home/howItWorks";
-import WhyUs from "@/components/pages/home/whyUs";
-import CTA from "@/components/pages/home/cta";
+import HeroSection from "@/components/pages/home/hero";
+import HowItWorksSection from "@/components/pages/home/howItWorks";
+import WhyUsSection from "@/components/pages/home/whyUs";
+import CTASection from "@/components/pages/home/cta";
 
 export default function Home() {
   return (
@@ -18,10 +18,10 @@ export default function Home() {
       header={<Navbar />}
       footer={<Footer />}
     >
-      <Hero />
-      <HowItWorks />
-      <WhyUs />
-      <CTA />
+      <HeroSection />
+      <HowItWorksSection />
+      <WhyUsSection />
+      <CTASection />
     </RootLayout>
   );
 }

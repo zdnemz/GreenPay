@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import * as React from "react";
 
-export default function CTA() {
+export default function CTASection() {
   return (
     <section className="relative grid h-[70vh] w-full items-center overflow-hidden">
       <div className="space-y-3">

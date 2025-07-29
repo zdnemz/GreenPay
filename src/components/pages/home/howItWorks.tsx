@@ -20,7 +20,7 @@ const steps = [
   },
 ];
 
-export default function HowItWorks() {
+export default function HowItWorksSection() {
   return (
     <section className="space-y-6">
       <div className="flex flex-col items-center justify-center space-y-1 text-center">

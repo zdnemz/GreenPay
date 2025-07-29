@@ -80,9 +80,9 @@ export default function Login() {
   }
 
   return (
-    <RootLayout>
-      <div className="flex min-h-screen items-center justify-center">
-        <Card className="w-full max-w-md shadow-lg">
+    <main className="grid md:grid-cols-2">
+      <section className="order-1 md:order-2">
+        <Card className="flex h-screen w-full flex-col justify-center rounded-t-none p-8 shadow-lg md:rounded-l-none md:p-12 lg:p-16">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold">Login</CardTitle>
           </CardHeader>
@@ -144,7 +144,15 @@ export default function Login() {
             </Button>
           </CardFooter>
         </Card>
-      </div>
-    </RootLayout>
+      </section>
+      <section className="flex items-center justify-center p-16 md:order-1">
+        <div className="max-w-md text-center">
+          <h2 className="text-3xl font-bold">Selamat Datang Kembali</h2>
+          <p className="text-muted-foreground">
+            Masukkan detail pribadi Anda untuk menggunakan semua fitur situs
+          </p>
+        </div>
+      </section>
+    </main>
   );
 }

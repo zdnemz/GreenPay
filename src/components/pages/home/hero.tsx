@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 
-export default function Hero() {
+export default function HeroSection() {
   return (
     <section className="grid min-h-screen grid-cols-1 items-center gap-x-6 gap-y-12 md:grid-cols-[2fr_1fr]">
       {/* Text */}

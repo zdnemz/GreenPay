@@ -7,8 +7,6 @@ import { useForm } from "react-hook-form";
 import z from "zod";
 import axios, { AxiosError } from "axios";
 
-import RootLayout from "@/components/layouts/RootLayout";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -80,11 +78,11 @@ export default function Register() {
   }
 
   return (
-    <RootLayout>
-      <div className="flex min-h-screen items-center justify-center">
-        <Card className="w-full max-w-md shadow-lg">
+    <main className="grid md:grid-cols-2">
+      <section className="order-2 md:order-1">
+        <Card className="flex h-screen w-full flex-col justify-center rounded-t-none p-8 shadow-lg md:rounded-l-none md:p-12 lg:p-16">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">register</CardTitle>
+            <CardTitle className="text-3xl font-bold">Daftar Akun</CardTitle>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -179,7 +177,18 @@ export default function Register() {
             </Button>
           </CardFooter>
         </Card>
-      </div>
-    </RootLayout>
+      </section>
+      <section className="order-1 flex items-center justify-center p-16 md:order-2">
+        <div className="max-w-md text-center">
+          <h2 className="text-3xl font-bold">
+            Halo, Sahabat <span className="text-primary">GreenPay</span>
+          </h2>
+          <p className="text-muted-foreground">
+            Daftar dengan detail pribadi Anda untuk menggunakan semua fitur
+            situs
+          </p>
+        </div>
+      </section>
+    </main>
   );
 }

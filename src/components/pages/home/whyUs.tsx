@@ -26,7 +26,7 @@ const benefits = [
   },
 ];
 
-export default function WhyUs() {
+export default function WhyUsSection() {
   return (
     <section className="relative h-full space-y-6 overflow-hidden lg:min-h-screen">
       {/* blob */}
