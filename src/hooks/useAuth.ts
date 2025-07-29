@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import axios, { AxiosError } from "axios";
-import { useRouter, usePathname  } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore, User } from "@/store/auth-store";
 import { ApiResponse } from "@/lib/response";
 
@@ -17,7 +17,7 @@ export const useAuthCheck = () => {
       setInitialized(true);
       return;
     }
-    
+
     const checkAuthStatus = async () => {
       try {
         setLoading(true);
@@ -45,7 +45,7 @@ export const useAuthCheck = () => {
     };
 
     checkAuthStatus();
-  }, [setUser, clearUser, setLoading, setInitialized]);
+  }, [setUser, clearUser, setLoading, setInitialized, pathname]);
 };
 
 export const useRequireAuth = (redirectTo: string = "/auth/login") => {

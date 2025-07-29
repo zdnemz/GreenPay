@@ -3,7 +3,7 @@ import { getUserFromSession } from "@/lib/auth";
 import { response } from "@/lib/response";
 import { Role, Status } from "@/generated/prisma/client";
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
     const user = await getUserFromSession();
 
@@ -47,7 +47,6 @@ export async function GET(req: Request) {
         rejected,
       },
     });
-
   } catch (err) {
     console.error("Error GET /admin/analytics:", err);
     return response(500, "Gagal memuat statistik");

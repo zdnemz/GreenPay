@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
     return res;
   }
 
-  const user = await getUserFromSession()
+  const user = await getUserFromSession();
 
   if (!user) {
     return response(404, "Pengguna tidak ditemukan");
@@ -54,7 +54,7 @@ export async function PUT(req: NextRequest) {
 
     return response(200, "Data berhasil diubah : " + updatedUser.name);
   } catch (err) {
-    return response(500, "Server error");
+    return response(500, `Server error : ${err}`);
   }
 }
 
@@ -77,7 +77,6 @@ export async function DELETE(req: NextRequest) {
 
     return res;
   } catch (err) {
-    return response(500, "Server error");
+    return response(500, `Server error : ${err}`);
   }
 }
-
