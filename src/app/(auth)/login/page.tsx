@@ -5,7 +5,7 @@ import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 import RootLayout from "@/components/layouts/RootLayout";
 
@@ -30,12 +30,15 @@ import { loginSchema } from "@/schemas/auth-schema";
 import { toast } from "sonner";
 import { ApiResponse } from "@/lib/response";
 import Link from "next/link";
-import { useAuthStore } from "@/store/auth-store";
+import { useAuthStore, User } from "@/store/auth-store";
 import { withGuest } from "@/hoc/withAuth";
+import { useRouter } from "next/navigation";
 
 export default withGuest(function () {
   const [isPending, startTransition] = React.useTransition();
-  const { setLoading } = useAuthStore();
+  const { setLoading, setUser } = useAuthStore();
+
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -62,10 +65,15 @@ export default withGuest(function () {
           return;
         }
 
+        await setUser(data.data as User);
+
         toast.success("Login sukses! Mengarahkan...");
+        router.push("/dashboard");
       } catch (error) {
-        console.error("Login error:", error);
-        toast.error("Terjadi Kesalahan");
+        if (error instanceof AxiosError) {
+          console.error("Login error:", error);
+          toast.error((error.response?.data as ApiResponse).error as string);
+        }
       } finally {
         setLoading(false);
       }

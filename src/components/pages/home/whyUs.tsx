@@ -30,7 +30,7 @@ export default function WhyUs() {
   return (
     <section className="relative h-full space-y-6 overflow-hidden lg:min-h-screen">
       {/* blob */}
-      <div className="absolute inset-0 w-full">
+      <div className="absolute inset-0 w-full scale-105">
         <Blob />
       </div>
 
@@ -62,10 +62,10 @@ export default function WhyUs() {
   );
 }
 
-function Blob() {
+const Blob = React.memo(() => {
   return (
     <svg
-      className="h-full w-[110%] opacity-70"
+      className="h-full w-full opacity-70"
       width="1954"
       height="856"
       viewBox="0 0 1954 856"
@@ -183,4 +183,6 @@ function Blob() {
       />
     </svg>
   );
-}
+});
+
+Blob.displayName = "BlobWhyUs";

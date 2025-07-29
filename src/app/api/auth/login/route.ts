@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
     const user = await db.user.findUnique({
       where: { email },
-      select: { password: true, id: true },
+      select: { password: true, id: true, name: true, email: true, role: true },
     });
 
     // jika user tidak terdaftar
@@ -41,7 +41,13 @@ export async function POST(req: NextRequest) {
     const token = signToken(user.id);
 
     // kembalikan response dengan cookies
-    const res = response(201, "Login berhasil");
+    const res = response(201, {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    });
+
     res.cookies.set({
       name: "auth-token",
       value: token,
