@@ -17,43 +17,41 @@ import axios, { AxiosError } from "axios";
 import { ApiResponse } from "@/lib/response";
 import { toast } from "sonner";
 import { UserData } from "@/types";
-import { useLoadingState } from "@/contexts/loading-context";
+import Loading from "@/components/Loading";
 
 export default function ProfileSection() {
   const [user, setUser] = React.useState<UserData | null>(null);
-  const { startLoading, stopLoading } = useLoadingState("user-dashboard");
+  const [loading, setLoading] = React.useState(true);
+
+  async function fetchData() {
+    try {
+      setLoading(true);
+      const { data } = await axios.get<ApiResponse>("/api/users/me");
+
+      setUser(data.data as UserData);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        console.error("Login error:", error);
+        toast.error((error.response?.data as ApiResponse).error as string);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
 
   React.useEffect(() => {
-    let cancel = true;
+    let canceled = true;
 
-    async function fetchData() {
-      if (cancel) return;
-      startLoading();
-      try {
-        const { data } = await axios.get<ApiResponse>("/api/users/me");
-
-        if (!data.success) {
-          toast.error((data.error as string) || "Terjadi Kesalahan");
-          return;
-        }
-
-        setUser(data.data as UserData);
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          console.error("Login error:", error);
-          toast.error((error.response?.data as ApiResponse).error as string);
-        }
-      } finally {
-        stopLoading();
-      }
-    }
+    if (!canceled) return;
 
     fetchData();
 
     return () => {
-      cancel = false;
+      canceled = false;
     };
-  }, [startLoading, stopLoading]);
+  }, []);
+
+  if (loading) return <Loading />;
 
   return (
     <section>
@@ -113,7 +111,7 @@ export default function ProfileSection() {
             </div>
 
             <div>
-              <EditProfileDialog user={user!} />
+              <EditProfileDialog user={user!} onSuccess={fetchData} />
             </div>
           </div>
 

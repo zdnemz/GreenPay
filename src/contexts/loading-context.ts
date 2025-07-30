@@ -9,12 +9,11 @@ export interface LoadingState {
 
 // Tipe untuk context value
 export interface LoadingContextType {
-  loadingStates: LoadingState;
-  setLoading: (key: string, isLoading: boolean) => void;
-  isAnyLoading: boolean;
+  setLoading: (key: string, value: boolean) => void;
   isLoading: (key: string) => boolean;
-  clearAllLoading: () => void;
-  getLoadingKeys: () => string[];
+  getAllKeys: () => string[];
+  clearAll: () => void;
+  isAnyLoading: boolean; // ✅ Tambahkan ini
 }
 
 // Buat context
@@ -34,23 +33,22 @@ export const useLoading = () => {
 export const useLoadingState = (key: string) => {
   const { setLoading, isLoading } = useLoading();
 
-  // STABLE functions dengan useCallback
   const startLoading = useCallback(
     () => setLoading(key, true),
-    [setLoading, key],
+    [key, setLoading],
   );
   const stopLoading = useCallback(
     () => setLoading(key, false),
-    [setLoading, key],
+    [key, setLoading],
   );
   const toggleLoading = useCallback(
-    (loading: boolean) => setLoading(key, loading),
-    [setLoading, key],
+    (val: boolean) => setLoading(key, val),
+    [key, setLoading],
   );
 
   return useMemo(
     () => ({
-      isLoading: isLoading(key),
+      isLoading: () => isLoading(key), // ⬅️ penting: getter function, bukan boolean
       setLoading: toggleLoading,
       startLoading,
       stopLoading,

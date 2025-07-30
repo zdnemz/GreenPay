@@ -1,8 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import { useLoading } from "@/contexts/loading-context";
+import { useLoading, useLoadingState } from "@/contexts/loading-context";
 import { useAuthCheck } from "@/hooks/useAuth";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import Loading from "../Loading";
 
 export interface AuthProviderProps {
@@ -11,6 +12,12 @@ export interface AuthProviderProps {
 
 export default function AuthProvider({ children }: AuthProviderProps) {
   useAuthCheck();
+
+  const { stopLoading } = useLoadingState("initial-load");
+
+  useEffect(() => {
+    stopLoading();
+  }, []);
 
   const { isAnyLoading } = useLoading();
 

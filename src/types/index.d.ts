@@ -16,3 +16,17 @@ export interface UserData {
   points: number;
   rank: number;
 }
+
+export interface leaderboardData {
+  users: {
+    rank: number;
+    id: string;
+    name: string;
+    role: string;
+    points: number;
+  }[];
+  myRank: number;
+  myPoints: number;
+  role: "USER";
+  page: number;
+}

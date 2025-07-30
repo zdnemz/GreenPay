@@ -1,91 +1,65 @@
 "use client";
 
-import {
-  LoadingContext,
-  LoadingContextType,
-  LoadingState,
-} from "@/contexts/loading-context";
-import * as React from "react";
+import { LoadingContext } from "@/contexts/loading-context";
+import React, { useContext, useCallback, useState, useMemo } from "react";
 
-interface LoadingProviderProps {
+export default function LoadingProvider({
+  children,
+}: {
   children: React.ReactNode;
-}
-
-export default function LoadingProvider({ children }: LoadingProviderProps) {
-  const [loadingStates, setLoadingStates] = React.useState<LoadingState>({
-    "initial-load": true,
-  });
-
-  // Function untuk set loading state - STABLE dengan useCallback
-  const setLoading = React.useCallback((key: string, isLoading: boolean) => {
-    setLoadingStates((prev) => {
-      const newState = { ...prev };
-      delete newState["initial-load"];
-
-      const currentState = newState[key] || false;
-      if (currentState === isLoading) {
-        return newState;
-      }
-
-      if (isLoading) {
-        newState[key] = true;
-      } else {
-        delete newState[key];
-      }
-
-      return newState;
-    });
-  }, []);
-
-  // Check apakah ada loading yang aktif - STABLE dengan useMemo
-  const isAnyLoading = React.useMemo(() => {
-    return Object.keys(loadingStates).length > 0;
-  }, [loadingStates]);
-
-  // Check loading state untuk key tertentu - STABLE dengan useCallback
-  const isLoading = React.useCallback(
-    (key: string): boolean => {
-      return loadingStates[key] || false;
-    },
-    [loadingStates],
+}) {
+  const [loadingMap, setLoadingMap] = useState<Map<string, boolean>>(
+    () => new Map([["initial-load", true]]),
   );
 
-  // Clear semua loading states - STABLE dengan useCallback
-  const clearAllLoading = React.useCallback(() => {
-    setLoadingStates((prev) => {
-      if (Object.keys(prev).length === 0) {
-        return prev;
+  const setLoading = useCallback((key: string, value: boolean) => {
+    setLoadingMap((prev) => {
+      const newMap = new Map(prev);
+      if (value) {
+        newMap.set(key, true);
+      } else {
+        newMap.delete(key);
       }
-      return {};
+      return newMap;
     });
   }, []);
 
-  // Get semua loading keys yang aktif - STABLE dengan useMemo
-  const getLoadingKeys = React.useCallback((): string[] => {
-    return Object.keys(loadingStates);
-  }, [loadingStates]);
+  const isLoading = useCallback(
+    (key: string) => {
+      return loadingMap.get(key) ?? false;
+    },
+    [loadingMap],
+  );
 
-  // STABLE context value dengan useMemo
-  const value: LoadingContextType = React.useMemo(
+  const getAllKeys = useCallback(() => {
+    return Array.from(loadingMap.keys());
+  }, [loadingMap]);
+
+  const clearAll = useCallback(() => {
+    setLoadingMap(new Map());
+  }, []);
+
+  const isAnyLoading = useMemo(() => loadingMap.size > 0, [loadingMap]);
+
+  const value = useMemo(
     () => ({
-      loadingStates,
       setLoading,
-      isAnyLoading,
       isLoading,
-      clearAllLoading,
-      getLoadingKeys,
+      getAllKeys,
+      clearAll,
+      isAnyLoading,
     }),
-    [
-      loadingStates,
-      setLoading,
-      isAnyLoading,
-      isLoading,
-      clearAllLoading,
-      getLoadingKeys,
-    ],
+    [setLoading, isLoading, getAllKeys, clearAll, isAnyLoading],
   );
 
   return (
     <LoadingContext.Provider value={value}>{children}</LoadingContext.Provider>
   );
 }
+
+export const useLoading = () => {
+  const context = useContext(LoadingContext);
+  if (!context)
+    throw new Error("useLoading must be used within LoadingProvider");
+  return context;
+};

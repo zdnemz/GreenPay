@@ -3,7 +3,6 @@
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import z from "zod";
 import { toast } from "sonner";
@@ -37,9 +36,13 @@ import { useLoadingState } from "@/contexts/loading-context";
 
 interface EditProfileDialogProps {
   user: UserData;
+  onSuccess: () => void;
 }
 
-export default function EditProfileDialog({ user }: EditProfileDialogProps) {
+export default function EditProfileDialog({
+  user,
+  onSuccess,
+}: EditProfileDialogProps) {
   const { startLoading, stopLoading } = useLoadingState("user-profile-edit");
 
   const [isPending, startTransition] = React.useTransition();
@@ -51,8 +54,6 @@ export default function EditProfileDialog({ user }: EditProfileDialogProps) {
       name: user?.name || "",
     },
   });
-
-  const router = useRouter();
 
   async function onSubmit(values: z.infer<typeof updateUserSchema>) {
     const cleanedValues = {
@@ -77,9 +78,9 @@ export default function EditProfileDialog({ user }: EditProfileDialogProps) {
           toast.error((data.error as string) || "Terjadi Kesalahan");
           return;
         }
+        onSuccess();
 
         toast.success("Profile telah diperbarui");
-        router.refresh();
       } catch (error) {
         if (error instanceof AxiosError) {
           console.error("Update profile error:", error);
