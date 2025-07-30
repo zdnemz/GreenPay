@@ -62,24 +62,24 @@ export default function ProfileSection() {
             alt="banner"
             width={1920} // optional
             height={400} // optional
-            className="h-48 w-full object-cover"
+            className="h-32 w-full object-cover sm:h-40 md:h-48"
           />
         </div>
 
         {/* profile */}
-        <div className="space-y-6 px-12 py-8">
-          <div className="flex justify-between">
+        <div className="space-y-4 px-4 py-6 sm:space-y-6 sm:px-8 md:px-12 md:py-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
             {/* user info */}
-            <div className="flex gap-x-6">
-              <div className="relative w-fit -translate-y-16">
-                <Avatar className="h-32 w-32">
+            <div className="flex flex-col gap-4 sm:flex-row sm:gap-x-6">
+              <div className="relative w-fit -translate-y-8 sm:-translate-y-12 md:-translate-y-16">
+                <Avatar className="h-20 w-20 sm:h-24 sm:w-24 md:h-32 md:w-32">
                   <AvatarImage src="/avatar.png" alt="User Avatar" />
                 </Avatar>
               </div>
 
-              <div className="space-y-1">
+              <div className="-mt-4 space-y-1 sm:mt-0">
                 <div>
-                  <h2 className="text-primary text-2xl font-semibold">
+                  <h2 className="text-primary text-xl font-semibold sm:text-2xl">
                     {user?.name}
                   </h2>
                 </div>
@@ -110,24 +110,28 @@ export default function ProfileSection() {
               </div>
             </div>
 
-            <div>
+            <div className="w-full sm:w-auto">
               <EditProfileDialog user={user!} onSuccess={fetchData} />
             </div>
           </div>
 
           {/* content */}
-          <div className="bg-background w-full space-y-1 rounded-md p-6">
+          <div className="bg-background w-full space-y-2 rounded-md p-4 sm:space-y-1 sm:p-6">
             <div>
-              <h3>User ID</h3>
-              <p className="text-muted-foreground text-sm">{user?.id}</p>
+              <h3 className="text-sm sm:text-base">User ID</h3>
+              <p className="text-muted-foreground text-xs sm:text-sm">
+                {user?.id}
+              </p>
             </div>
             <div>
-              <h3>Email</h3>
-              <p className="text-muted-foreground text-sm">{user?.email}</p>
+              <h3 className="text-sm sm:text-base">Email</h3>
+              <p className="text-muted-foreground text-xs sm:text-sm">
+                {user?.email}
+              </p>
             </div>
             <div>
-              <h3>Dibuat pada</h3>
-              <p className="text-muted-foreground text-sm">
+              <h3 className="text-sm sm:text-base">Dibuat pada</h3>
+              <p className="text-muted-foreground text-xs sm:text-sm">
                 {user?.createdAt
                   ? new Intl.DateTimeFormat("id-ID", {
                       day: "numeric",
@@ -143,11 +147,3 @@ export default function ProfileSection() {
     </section>
   );
 }
-
-// export default function Test() {
-//   return (
-//     <div>
-//       <h1>Gelo</h1>
-//     </div>
-//   )
-// }

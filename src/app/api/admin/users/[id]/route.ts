@@ -2,7 +2,9 @@ import { db } from "@/lib/db";
 import { NextRequest } from "next/server";
 import { getUserFromSession } from "@/lib/auth";
 import { response } from "@/lib/response";
-import { Role } from "@/generated/prisma/client";
+import { Role } from "@/generated/prisma/enums";
+import { validate } from "@/lib/validate";
+import { UserUpdateSchema } from "@/schemas/admin-schema";
 
 export async function GET(
   _req: NextRequest,
@@ -51,24 +53,19 @@ export async function PUT(
 
   try {
     const { id } = await params;
-    const { role } = await req.json();
+    const data = await req.json();
 
-    if (!role) {
-      return response(400, "Field role wajib diisi");
-    }
+    const validated = await validate(UserUpdateSchema, data);
 
-    const allowedRoles = Object.values(Role);
+    console.log("dataaaaaaaaaasadas", data);
 
-    if (!allowedRoles.includes(role)) {
-      return response(
-        400,
-        `Role tidak valid. Hanya bisa: ${allowedRoles.join(", ")}`,
-      );
+    if (!validated.success) {
+      return response(400, validated.error);
     }
 
     const updatedUser = await db.user.update({
       where: { id },
-      data: { role },
+      data: validated.data,
       select: {
         id: true,
         name: true,
@@ -79,7 +76,7 @@ export async function PUT(
 
     return response(200, updatedUser);
   } catch (error) {
-    console.error("Error saat update role:", error);
+    console.error("Error saat update user:", error);
 
     return response(500, "Terjadi kesalahan pada server");
   }

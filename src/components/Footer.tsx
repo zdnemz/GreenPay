@@ -4,14 +4,22 @@ import Link from "next/link";
 import { Instagram, Twitter } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import GreenPayIcon from "./icons/GreenPay";
 
 export default function Footer() {
   return (
     <footer className="bg-sidebar border-t">
-      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-6 py-10 md:grid-cols-3">
+      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 py-10 md:grid-cols-3">
         {/* Logo & Description */}
         <div className="space-y-3">
-          <h2 className="text-primary text-2xl font-bold">GreenPay</h2>
+          <h1 className="text-2xl font-semibold">
+            <Link href="/" className="flex items-center gap-x-1">
+              <GreenPayIcon className="text-primary h-8 w-8" />
+              <span>
+                <span className="text-primary">Green</span>Pay
+              </span>
+            </Link>
+          </h1>
           <p className="text-muted-foreground text-sm">
             Platform digital tukar sampah jadi saldo. Bersih lingkungannya, cuan
             kantongnya.
@@ -23,16 +31,36 @@ export default function Footer() {
           <h3 className="text-foreground font-semibold">Navigasi</h3>
           <ul className="text-muted-foreground space-y-2 text-sm">
             <li>
-              <Link href="/">Beranda</Link>
+              <Link
+                className="hover:text-primary transition-colors duration-300"
+                href="/"
+              >
+                Beranda
+              </Link>
             </li>
             <li>
-              <Link href="/how-it-works">Cara Kerja</Link>
+              <Link
+                className="hover:text-primary transition-colors duration-300"
+                href="/how-it-works"
+              >
+                Cara Kerja
+              </Link>
             </li>
             <li>
-              <Link href="/leaderboard">Leaderboard</Link>
+              <Link
+                className="hover:text-primary transition-colors duration-300"
+                href="/leaderboard"
+              >
+                Leaderboard
+              </Link>
             </li>
             <li>
-              <Link href="/about">Tentang Kami</Link>
+              <Link
+                className="hover:text-primary transition-colors duration-300"
+                href="/about"
+              >
+                Tentang Kami
+              </Link>
             </li>
           </ul>
         </div>
