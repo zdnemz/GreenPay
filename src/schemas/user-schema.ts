@@ -17,7 +17,7 @@ export const updateUserSchema = z
       .string()
       .transform((val) => (val.trim() === "" ? undefined : val.trim()))
       .optional()
-      .refine((val) => !val || z.string().email().safeParse(val).success, {
+      .refine((val) => !val || z.email().safeParse(val).success, {
         message: "Format email tidak valid",
       }),
   })
