@@ -12,7 +12,11 @@ import {
 import GreenPayIcon from "./icons/GreenPay";
 import ToggleTheme from "./ToggleTheme";
 import { Menu, X } from "lucide-react";
-import { useAuthActions, useIsAuthenticated } from "@/store/auth-store";
+import {
+  useAuthActions,
+  useAuthUser,
+  useIsAuthenticated,
+} from "@/store/auth-store";
 import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
 import { ApiResponse } from "@/lib/response";
@@ -213,6 +217,8 @@ function NavbarAction({
   isAuthenticated: boolean;
   onLogout: () => void;
 }) {
+  const user = useAuthUser();
+
   return (
     <div className="flex items-center space-x-3">
       {!isAuthenticated ? (
@@ -236,12 +242,43 @@ function NavbarAction({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="p-3" align="end">
-            <DropdownMenuItem asChild className="cursor-pointer">
-              <Link href="/dashboard">Dashboard</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild className="cursor-pointer">
-              <Link href="/transactions">Riwayat Transaksi</Link>
-            </DropdownMenuItem>
+            {user?.role === "ADMIN" && (
+              <>
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link href="/admin/dashboard">Dashboard</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link href="/admin/users">Kelola User</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link href="/admin/petugas">Manajemen Petugas</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link href="/admin/transactions">Transaksi</Link>
+                </DropdownMenuItem>
+              </>
+            )}
+            {user?.role === "PETUGAS" && (
+              <>
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link href="/petugas">Dashboard</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link href="/petugas/input">Input Data</Link>
+                </DropdownMenuItem>
+              </>
+            )}
+
+            {user?.role === "USER" && (
+              <>
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link href="/dashboard">Dashboard</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link href="/transactions">Riwayat Transaksi</Link>
+                </DropdownMenuItem>
+              </>
+            )}
             <DropdownMenuSeparator />
 
             <Dialog>
@@ -300,6 +337,8 @@ function MobileProfileMenu({
   onClose: () => void;
   onLogout: () => void;
 }) {
+  const user = useAuthUser();
+
   if (!isAuthenticated) {
     return (
       <div className="flex flex-col space-y-3">
@@ -319,20 +358,76 @@ function MobileProfileMenu({
 
   return (
     <div className="flex flex-col space-y-3">
-      <Link
-        href="/dashboard"
-        className="hover:text-primary transition-colors"
-        onClick={onClose}
-      >
-        Dashboard
-      </Link>
-      <Link
-        href="/transactions"
-        className="hover:text-primary transition-colors"
-        onClick={onClose}
-      >
-        Riwayat Transaksi
-      </Link>
+      {user?.role === "ADMIN" && (
+        <>
+          <Link
+            href="/admin/dashboard"
+            className="hover:text-primary transition-colors"
+            onClick={onClose}
+          >
+            Dashboard
+          </Link>
+          <Link
+            href="/admin/users"
+            className="hover:text-primary transition-colors"
+            onClick={onClose}
+          >
+            Kelola User
+          </Link>
+          <Link
+            href="/admin/petugas"
+            className="hover:text-primary transition-colors"
+            onClick={onClose}
+          >
+            Manajemen Petugas
+          </Link>
+          <Link
+            href="/admin/transactions"
+            className="hover:text-primary transition-colors"
+            onClick={onClose}
+          >
+            Transaksi
+          </Link>
+        </>
+      )}
+
+      {user?.role === "PETUGAS" && (
+        <>
+          <Link
+            href="/petugas"
+            className="hover:text-primary transition-colors"
+            onClick={onClose}
+          >
+            Dashboard
+          </Link>
+          <Link
+            href="/petugas/input"
+            className="hover:text-primary transition-colors"
+            onClick={onClose}
+          >
+            Input Data
+          </Link>
+        </>
+      )}
+
+      {user?.role === "USER" && (
+        <>
+          <Link
+            href="/dashboard"
+            className="hover:text-primary transition-colors"
+            onClick={onClose}
+          >
+            Dashboard
+          </Link>
+          <Link
+            href="/transactions"
+            className="hover:text-primary transition-colors"
+            onClick={onClose}
+          >
+            Riwayat Transaksi
+          </Link>
+        </>
+      )}
       <Dialog>
         <DialogTrigger asChild>
           <Button variant="destructive" className="w-full cursor-pointer">

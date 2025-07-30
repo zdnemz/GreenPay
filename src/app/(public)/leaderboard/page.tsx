@@ -31,7 +31,7 @@ export default function Leaderboard() {
         setLeaderboard(data.data as LeaderboardData);
       } catch (error) {
         if (error instanceof AxiosError) {
-          console.error("Login error:", error);
+          console.error("Leaderboard error:", error);
           toast.error((error.response?.data as ApiResponse).error as string);
         }
       } finally {

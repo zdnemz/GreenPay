@@ -4,6 +4,7 @@ import { response } from "@/lib/response";
 import { getUserFromSession } from "@/lib/auth";
 import { calculatePoints, POINTS_CONFIG } from "@/lib/points";
 import { createTransactionSchema } from "@/schemas/transaction-schema";
+import { validate } from "@/lib/validate";
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,17 +14,14 @@ export async function POST(req: NextRequest) {
       return response(401, "Hanya petugas yang dapat mengakses endpoint ini");
     }
 
-    const body = await req.json();
-    const parse = createTransactionSchema.safeParse(body);
+    const data = await req.json();
+    const validated = await validate(createTransactionSchema, data);
 
-    if (!parse.success) {
-      return response(400, {
-        message: "Validasi gagal",
-        errors: parse.error.flatten().fieldErrors,
-      });
+    if (!validated.success) {
+      return response(400, validated.error);
     }
 
-    const { userId, trashType, weight } = parse.data;
+    const { userId, trashType, weight } = validated.data;
 
     const user = await db.user.findUnique({
       where: { id: userId },

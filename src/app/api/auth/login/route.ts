@@ -40,6 +40,7 @@ export async function POST(req: NextRequest) {
     // membuat token jwt
     const token = signToken({
       id: user.id,
+      name: user.name,
       email: user.email,
       role: user.role,
     });
@@ -47,6 +48,7 @@ export async function POST(req: NextRequest) {
     // kembalikan response dengan cookies
     const res = response(201, {
       id: user.id,
+      name: user.name,
       email: user.email,
       role: user.role,
     });

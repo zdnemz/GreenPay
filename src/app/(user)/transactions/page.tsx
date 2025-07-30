@@ -36,7 +36,7 @@ export default function Transactions() {
         setTransactions(data.data as TransactionData);
       } catch (error) {
         if (error instanceof AxiosError) {
-          console.error("Login error:", error);
+          console.error("Transaction error:", error);
           toast.error((error.response?.data as ApiResponse).error as string);
         }
       } finally {

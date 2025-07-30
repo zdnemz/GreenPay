@@ -13,8 +13,8 @@ const JWT_OPTIONS = {
 /**
  * Generate JWT token berdasarkan userId
  */
-export function signToken({ id, email, role }: User): string {
-  return jwt.sign({ id, email, role }, JWT_SECRET, JWT_OPTIONS);
+export function signToken({ id, email, name, role }: User): string {
+  return jwt.sign({ id, email, name, role }, JWT_SECRET, JWT_OPTIONS);
 }
 
 /**

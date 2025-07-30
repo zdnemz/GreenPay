@@ -3,6 +3,7 @@ import type { Decimal } from "@prisma/client/runtime/library";
 export interface User {
   id: string;
   email: string;
+  name: string;
   role: "USER" | "PETUGAS" | "ADMIN";
 }
 
@@ -44,4 +45,24 @@ export interface TransactionData {
   page: number;
   total: number;
   totalPages: number;
+}
+
+export interface AdminAnalyticData {
+  totalUser: number;
+  totalPetugas: number;
+  totalTransaksi: number;
+  totalSampah: {
+    type: TrashType;
+    total: number;
+  }[];
+  transaksiPerBulan: {
+    bulan: number;
+    tahun: number;
+    jumlah: number;
+  }[];
+  transaksiStatus: {
+    pending: number;
+    approved: number;
+    rejected: number;
+  };
 }

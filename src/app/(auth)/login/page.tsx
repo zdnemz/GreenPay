@@ -68,7 +68,11 @@ export default function Login() {
         await setUser(data.data as User);
 
         toast.success("Login sukses! Mengarahkan...");
-        router.push("/dashboard");
+        if ((data.data as User).role === "ADMIN") {
+          router.replace("/admin/dashboard");
+          return;
+        }
+        router.replace("/dashboard");
       } catch (error) {
         if (error instanceof AxiosError) {
           console.error("Login error:", error);
