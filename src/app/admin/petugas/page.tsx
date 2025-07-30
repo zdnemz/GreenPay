@@ -17,12 +17,14 @@ import { ApiResponse } from "@/lib/response";
 import { User } from "@/types";
 import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
-import { EditUserDialog } from "@/components/pages/admin/users/editUser";
 import { Card } from "@/components/ui/card";
+import { EditPetugasDialog } from "@/components/pages/admin/petugas/editPetugas";
 import { DeleteUserDialog } from "@/components/pages/admin/users/deleteUser";
+import { AddPetugasDialog } from "@/components/pages/admin/petugas/addPetugas";
 
-export default function Users() {
-  const [users, setUsers] = React.useState<(User & { createdAt: Date })[]>();
+export default function Petugas() {
+  const [petugas, setPetugas] =
+    React.useState<(User & { createdAt: Date })[]>();
   const [loading, setLoading] = React.useState(true);
   const [refreshKey, setRefreshKey] = React.useState(0);
 
@@ -32,8 +34,8 @@ export default function Users() {
     if (!canceled) return;
     async function fetchData() {
       try {
-        const { data } = await axios.get<ApiResponse>("/api/admin/users");
-        setUsers(data.data as (User & { createdAt: Date })[]);
+        const { data } = await axios.get<ApiResponse>("/api/admin/petugas");
+        setPetugas(data.data as (User & { createdAt: Date })[]);
       } catch (error) {
         if (error instanceof AxiosError) {
           console.error("Admin dashboard error:", error);
@@ -50,7 +52,7 @@ export default function Users() {
     };
   }, [refreshKey]);
 
-  if (loading || !users) return <Loading />;
+  if (loading || !petugas) return <Loading />;
 
   return (
     <RootLayout header={<Navbar />} footer={<Footer />}>
@@ -63,25 +65,26 @@ export default function Users() {
           </p>
         </div>
 
-        <Card className="p-6 shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]">
+        <Card className="gap-3 p-6 shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]">
+          <div className="flex justify-end">
+            <AddPetugasDialog onSuccess={() => setRefreshKey((k) => k + 1)} />
+          </div>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>ID</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Nama</TableHead>
-                <TableHead>Role</TableHead>
                 <TableHead>Tanggal</TableHead>
                 <TableHead>Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users.map((user) => (
+              {petugas.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell>{user.id}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.name}</TableCell>
-                  <TableCell>{user.role}</TableCell>
                   <TableCell>
                     {new Date(user.createdAt).toLocaleString("id-ID", {
                       dateStyle: "medium",
@@ -89,8 +92,8 @@ export default function Users() {
                     })}
                   </TableCell>
                   <TableCell className="space-x-2">
-                    <EditUserDialog
-                      user={user}
+                    <EditPetugasDialog
+                      petugas={user}
                       onSuccess={() => setRefreshKey((k) => k + 1)}
                     />
                     <DeleteUserDialog

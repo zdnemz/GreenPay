@@ -2,7 +2,6 @@ import { db } from "@/lib/db";
 import { NextRequest } from "next/server";
 import { getUserFromSession } from "@/lib/auth";
 import { response } from "@/lib/response";
-import { Role } from "@/generated/prisma/enums";
 import { validate } from "@/lib/validate";
 import { UserUpdateSchema } from "@/schemas/admin-schema";
 
@@ -56,8 +55,6 @@ export async function PUT(
     const data = await req.json();
 
     const validated = await validate(UserUpdateSchema, data);
-
-    console.log("dataaaaaaaaaasadas", data);
 
     if (!validated.success) {
       return response(400, validated.error);

@@ -10,7 +10,7 @@ export default function Statistic({
 }) {
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
-      <Card className="p-6">
+      <Card className="hover:border-primary p-6 transition-all duration-300 hover:shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]">
         <div className="flex gap-6">
           <div className="flex items-center justify-center">
             <UserCircle2 className="h-8 w-8" />
@@ -23,7 +23,7 @@ export default function Statistic({
           </div>
         </div>
       </Card>
-      <Card className="p-6">
+      <Card className="hover:border-primary p-6 transition-all duration-300 hover:shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]">
         <div className="flex gap-6">
           <div className="flex items-center justify-center">
             <Wrench className="h-8 w-8" />
@@ -36,7 +36,7 @@ export default function Statistic({
           </div>
         </div>
       </Card>
-      <Card className="p-6">
+      <Card className="hover:border-primary p-6 transition-all duration-300 hover:shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]">
         <div className="flex gap-6">
           <div className="flex items-center justify-center">
             <Trash2 className="h-8 w-8" />
@@ -49,7 +49,7 @@ export default function Statistic({
           </div>
         </div>
       </Card>
-      <Card className="p-6">
+      <Card className="hover:border-primary p-6 transition-all duration-300 hover:shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]">
         <div className="flex gap-6">
           <div className="flex items-center justify-center">
             <ArrowLeftRight className="h-8 w-8" />

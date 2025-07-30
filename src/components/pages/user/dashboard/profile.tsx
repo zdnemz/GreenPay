@@ -18,6 +18,7 @@ import { ApiResponse } from "@/lib/response";
 import { toast } from "sonner";
 import { UserData } from "@/types";
 import Loading from "@/components/Loading";
+import ChangePasswordDialog from "./changePassword";
 
 export default function ProfileSection() {
   const [user, setUser] = React.useState<UserData | null>(null);
@@ -110,7 +111,8 @@ export default function ProfileSection() {
               </div>
             </div>
 
-            <div className="w-full sm:w-auto">
+            <div className="w-full space-x-3 sm:w-auto">
+              <ChangePasswordDialog />
               <EditProfileDialog user={user!} onSuccess={fetchData} />
             </div>
           </div>

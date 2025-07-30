@@ -9,12 +9,42 @@ import Loading from "@/components/Loading";
 import Navbar from "@/components/Navbar";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
+import { APP_ENV } from "@/lib/config";
 import { ApiResponse } from "@/lib/response";
 import { LeaderboardData } from "@/types";
 import axios, { AxiosError } from "axios";
 import Image from "next/image";
 import * as React from "react";
 import { toast } from "sonner";
+
+const MOCK_DATA =
+  APP_ENV === "development"
+    ? (() => {
+        const users = Array.from({ length: 20 }, (_, i) => ({
+          id: `user-${i + 1}`,
+          name: `Pengguna ${i + 1}`,
+          role: "USER" as const,
+          points: Math.floor(Math.random() * 1000),
+          rank: 0,
+        }));
+
+        users.sort((a, b) => b.points - a.points);
+
+        users.forEach((user, index) => {
+          user.rank = index + 1;
+        });
+
+        const currentUser = users.find((u) => u.id === "user-14");
+
+        return {
+          users,
+          myRank: currentUser?.rank ?? -1,
+          myPoints: currentUser?.points ?? 0,
+          role: "USER",
+          page: 1,
+        };
+      })()
+    : null;
 
 export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = React.useState<LeaderboardData>();
@@ -24,8 +54,14 @@ export default function Leaderboard() {
     let canceled = true;
 
     if (!canceled) return;
+
     async function fetchData() {
       try {
+        if (APP_ENV == "development") {
+          setLeaderboard(MOCK_DATA as LeaderboardData);
+          return;
+        }
+
         const { data } = await axios.get<ApiResponse>("/api/leaderboard");
 
         setLeaderboard(data.data as LeaderboardData);
@@ -60,7 +96,7 @@ export default function Leaderboard() {
           </div>
 
           {/* content */}
-          <div className="space-y-6">
+          <div className="w-full max-w-lg space-y-6">
             {/* 1,2,3 rank */}
             <div className="flex justify-center gap-6 pt-12 md:gap-12">
               <div>
@@ -75,8 +111,8 @@ export default function Leaderboard() {
                     <Second />
                   </div>
                 </div>
-                <div className="mt-6 max-w-24 text-center break-words">
-                  <h2 className="text-xl font-semibold">
+                <div className="mt-6 max-w-24 text-center">
+                  <h2 className="truncate text-xl font-semibold">
                     {leaderboard.users[1].name}
                   </h2>
                   <h3 className="text-primary text-2xl font-semibold">
@@ -97,8 +133,8 @@ export default function Leaderboard() {
                     <First />
                   </div>
                 </div>
-                <div className="mt-6 max-w-24 text-center break-words">
-                  <h2 className="text-xl font-semibold">
+                <div className="mt-6 max-w-24 text-center">
+                  <h2 className="truncate text-xl font-semibold">
                     {leaderboard.users[0].name}
                   </h2>
                   <h3 className="text-primary text-2xl font-semibold">
@@ -119,8 +155,8 @@ export default function Leaderboard() {
                     <Third />
                   </div>
                 </div>
-                <div className="mt-6 max-w-24 text-center break-words">
-                  <h2 className="text-xl font-semibold">
+                <div className="mt-6 max-w-24 text-center">
+                  <h2 className="truncate text-xl font-semibold">
                     {leaderboard.users[2].name}
                   </h2>
                   <h3 className="text-primary text-2xl font-semibold">

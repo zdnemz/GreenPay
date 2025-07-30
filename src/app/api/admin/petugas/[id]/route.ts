@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { response } from "@/lib/response";
 import { getUserFromSession } from "@/lib/auth";
-import { Role } from "@/generated/prisma/client";
+import { validate } from "@/lib/validate";
+import { PetugasUpdateSchema } from "@/schemas/admin-schema";
 
 export async function GET(
   _: NextRequest,
@@ -48,35 +49,26 @@ export async function PUT(
   const sessionUser = await getUserFromSession();
 
   if (!sessionUser || sessionUser.role !== "ADMIN") {
-    return response(401, "Tidak diizinkan");
+    return response(401, "Tidak memiliki akses");
   }
 
   try {
     const { id } = await params;
-    const { role } = await req.json();
+    const data = await req.json();
 
-    if (!role) {
-      return response(400, "Role wajib diisi");
-    }
+    const validated = await validate(PetugasUpdateSchema, data);
 
-    // Validasi role dengan mengambil dari Prisma
-    const allowedRoles = Object.values(Role);
-
-    if (!allowedRoles.includes(role)) {
-      return response(
-        400,
-        `Role tidak valid. Hanya bisa: ${allowedRoles.join(", ")}`,
-      );
+    if (!validated.success) {
+      return response(400, validated.error);
     }
 
     const updated = await db.user.update({
       where: { id },
-      data: { role },
+      data: validated.data,
       select: {
         id: true,
         name: true,
         email: true,
-        role: true,
       },
     });
 

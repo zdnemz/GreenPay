@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import * as React from "react";
 
 export default function CTASection() {
@@ -19,8 +20,9 @@ export default function CTASection() {
           <Button
             size="lg"
             className="relative cursor-pointer bg-[linear-gradient(270deg,var(--chart-1),var(--chart-2),var(--chart-3),var(--chart-4))] bg-[length:200%_200%] shadow transition-all duration-300 hover:shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]"
+            asChild
           >
-            Daftar Gratis Sekarang
+            <Link href="/register">Daftar Gratis Sekarang</Link>
           </Button>
         </div>
       </div>
@@ -32,7 +34,9 @@ export default function CTASection() {
   );
 }
 
-function Blob() {
+const Blob = React.memo(Vector);
+
+function Vector() {
   return (
     <svg
       className="h-full w-[200vw] opacity-60"

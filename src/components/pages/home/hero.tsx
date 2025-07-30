@@ -5,6 +5,7 @@ import * as React from "react";
 import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function HeroSection() {
   return (
@@ -24,8 +25,9 @@ export default function HeroSection() {
         <Button
           size="lg"
           className="relative cursor-pointer bg-[linear-gradient(270deg,var(--chart-1),var(--chart-2),var(--chart-3),var(--chart-4))] bg-[length:200%_200%] shadow transition-all duration-300 hover:shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]"
+          asChild
         >
-          Mulai Sekarang
+          <Link href="/register"> Mulai Sekarang</Link>
         </Button>
       </div>
 

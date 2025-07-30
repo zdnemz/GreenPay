@@ -17,9 +17,18 @@ import TrashTypeTotalChart from "@/components/pages/admin/dashboard/trashTypeTot
 import Statistic from "@/components/pages/admin/dashboard/statictic";
 
 // mock data for development
-const MOCK_DATA =
+const MOCK_DATA: AdminAnalyticData | null =
   APP_ENV === "development"
     ? {
+        totalUser: 150,
+        totalPetugas: 10,
+        totalTransaksi: 65,
+        totalSampah: [
+          { type: "Plastik", total: 120 },
+          { type: "Kertas", total: 90 },
+          { type: "Logam", total: 30 },
+          { type: "Kaca", total: 50 },
+        ],
         transaksiPerBulan: [
           { bulan: 8, tahun: 2024, jumlah: 120 },
           { bulan: 9, tahun: 2024, jumlah: 140 },
@@ -38,19 +47,11 @@ const MOCK_DATA =
           { bulan: 10, tahun: 2025, jumlah: 320 },
           { bulan: 11, tahun: 2025, jumlah: 390 },
         ],
-
         transaksiStatus: {
           pending: 15,
           approved: 42,
           rejected: 8,
         },
-
-        totalJenisSampah: [
-          { type: "Plastik", total: 120 },
-          { type: "Kertas", total: 90 },
-          { type: "Logam", total: 30 },
-          { type: "Kaca", total: 50 },
-        ],
       }
     : null;
 
@@ -66,6 +67,11 @@ export default function Dashboard() {
     if (!canceled) return;
     async function fetchData() {
       try {
+        if (APP_ENV == "development") {
+          setanalytics(MOCK_DATA as AdminAnalyticData);
+          return;
+        }
+
         const { data } = await axios.get<ApiResponse>("/api/admin/analytics");
 
         setanalytics(data.data as AdminAnalyticData);
@@ -103,21 +109,13 @@ export default function Dashboard() {
 
           <div className="grid gap-6 md:grid-cols-2">
             <div className="md:col-span-2">
-              <TransactionGraphics
-                data={
-                  MOCK_DATA?.transaksiPerBulan || analytics.transaksiPerBulan
-                }
-              />
+              <TransactionGraphics data={analytics.transaksiPerBulan} />
             </div>
             <div className="md:col-span-1">
-              <TransactionStatusChart
-                data={MOCK_DATA?.transaksiStatus || analytics.transaksiStatus}
-              />
+              <TransactionStatusChart data={analytics.transaksiStatus} />
             </div>
             <div className="md:col-span-1">
-              <TrashTypeTotalChart
-                data={MOCK_DATA?.totalJenisSampah || analytics.totalSampah}
-              />
+              <TrashTypeTotalChart data={analytics.totalSampah} />
             </div>
           </div>
         </div>

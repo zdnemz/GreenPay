@@ -15,6 +15,7 @@ export async function POST(req: NextRequest) {
     if (!session) return response(401, "Unauthorized");
 
     const data = await req.json();
+
     const validated = await validate(changePasswordSchema, data);
 
     if (!validated.success) {
@@ -22,6 +23,12 @@ export async function POST(req: NextRequest) {
     }
 
     const { oldPassword, newPassword } = validated.data;
+
+    if (oldPassword === newPassword)
+      return response(
+        400,
+        "Password baru tidak boleh sama dengan password lama",
+      );
 
     const user = await db.user.findUnique({
       where: { id: session.id },

@@ -29,7 +29,7 @@ export default function TransactionChart({ data }: Props) {
   }));
 
   return (
-    <Card>
+    <Card className="hover:border-primary transition-all duration-300 hover:shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]">
       <CardHeader className="border-b pb-4">
         <CardTitle className="text-lg font-semibold">
           Statistik Transaksi Bulanan
