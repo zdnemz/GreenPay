@@ -4,7 +4,7 @@ export async function DELETE() {
   try {
     const res = response(200, "Logout berhasil");
 
-    res.cookies.delete("auth-token");
+    res.cookies.delete("auth_token");
 
     return res;
   } catch (error) {

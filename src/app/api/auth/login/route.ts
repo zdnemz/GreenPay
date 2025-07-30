@@ -38,18 +38,21 @@ export async function POST(req: NextRequest) {
       return response(401, "Email atau Password tidak cocok");
 
     // membuat token jwt
-    const token = signToken(user.id);
+    const token = signToken({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    });
 
     // kembalikan response dengan cookies
     const res = response(201, {
       id: user.id,
-      name: user.name,
       email: user.email,
       role: user.role,
     });
 
     res.cookies.set({
-      name: "auth-token",
+      name: "auth_token",
       value: token,
       httpOnly: true,
       secure: APP_ENV === "production",

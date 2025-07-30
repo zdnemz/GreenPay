@@ -5,7 +5,11 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 
-import { useAuthStore } from "@/store/auth-store";
+import {
+  useAuthUser,
+  useIsAuthenticated,
+  useIsInitialized,
+} from "@/store/auth-store";
 import { User } from "@/generated/prisma/client";
 import { Button } from "@/components/ui/button";
 import RootLayout from "@/components/layouts/RootLayout";
@@ -18,18 +22,17 @@ export const withAuth = <P extends object>(
   roles?: User["role"][],
 ) => {
   return function AuthenticatedComponent(props: P) {
-    const { isAuthenticated, isInitialized, loading, user } = useAuthStore();
+    const isAuthenticated = useIsAuthenticated();
+    const isInitialized = useIsInitialized();
+    const user = useAuthUser();
+
     const router = useRouter();
-    const [redirecting, setRedirecting] = useState(false);
 
     useEffect(() => {
       if (isInitialized && !isAuthenticated) {
-        setRedirecting(true);
         router.push(redirectTo);
       }
     }, [isInitialized, isAuthenticated, router]);
-
-    if (!isInitialized || redirecting || loading) return <Loading />;
 
     if (roles && (!user?.role || !roles.includes(user.role))) {
       return (
@@ -63,7 +66,9 @@ export const withGuest = <P extends object>(
   redirectTo: string = "/",
 ) => {
   return function GuestComponent(props: P) {
-    const { isAuthenticated, isInitialized, loading } = useAuthStore();
+    const isAuthenticated = useIsAuthenticated();
+    const isInitialized = useIsInitialized();
+
     const router = useRouter();
     const [redirecting, setRedirecting] = useState(false);
 
@@ -74,7 +79,7 @@ export const withGuest = <P extends object>(
       }
     }, [isAuthenticated, isInitialized, router]);
 
-    if (!isInitialized || redirecting || loading) return <Loading />;
+    if (!isInitialized || redirecting) return <Loading />;
 
     if (isAuthenticated) {
       return <NotFound />;

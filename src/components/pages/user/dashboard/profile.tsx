@@ -3,8 +3,6 @@
 import * as React from "react";
 import Image from "next/image";
 
-import { useAuthStore, User } from "@/store/auth-store";
-
 import { ChevronUp, Info, Trophy } from "lucide-react";
 
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
@@ -15,9 +13,39 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import EditProfileDialog from "./profileEdit";
+import axios, { AxiosError } from "axios";
+import { ApiResponse } from "@/lib/response";
+import { toast } from "sonner";
+import { UserData } from "@/types";
 
 export default function ProfileSection() {
-  const { user } = useAuthStore() as { user: User };
+  const [user, setUser] = React.useState<UserData | null>(null);
+  const [hasFetched, setHasFetched] = React.useState(false);
+
+  React.useEffect(() => {
+    if (hasFetched) return;
+    async function fetchData() {
+      try {
+        const { data } = await axios.get<ApiResponse>("/api/users/me");
+
+        if (!data.success) {
+          toast.error((data.error as string) || "Terjadi Kesalahan");
+          return;
+        }
+
+        setUser(data.data as UserData);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          console.error("Login error:", error);
+          toast.error((error.response?.data as ApiResponse).error as string);
+        }
+      } finally {
+        setHasFetched(true);
+      }
+    }
+
+    fetchData();
+  }, [hasFetched]);
 
   return (
     <section>
@@ -46,7 +74,7 @@ export default function ProfileSection() {
               <div className="space-y-1">
                 <div>
                   <h2 className="text-primary text-2xl font-semibold">
-                    {user.name}
+                    {user?.name}
                   </h2>
                 </div>
                 <div>
@@ -76,7 +104,7 @@ export default function ProfileSection() {
             </div>
 
             <div>
-              <EditProfileDialog />
+              <EditProfileDialog user={user!} />
             </div>
           </div>
 
@@ -84,11 +112,17 @@ export default function ProfileSection() {
           <div className="bg-background w-full space-y-1 rounded-md p-6">
             <div>
               <h3>User ID</h3>
-              <p className="text-muted-foreground text-sm">{user.id}</p>
+              <p className="text-muted-foreground text-sm">{user?.id}</p>
             </div>
             <div>
               <h3>Email</h3>
-              <p className="text-muted-foreground text-sm">{user.email}</p>
+              <p className="text-muted-foreground text-sm">{user?.email}</p>
+            </div>
+            <div>
+              <h3>Dibuat pada</h3>
+              <p className="text-muted-foreground text-sm">
+                {user?.createdAt.toLocaleString()}
+              </p>
             </div>
           </div>
         </div>
@@ -96,3 +130,11 @@ export default function ProfileSection() {
     </section>
   );
 }
+
+// export default function Test() {
+//   return (
+//     <div>
+//       <h1>Gelo</h1>
+//     </div>
+//   )
+// }

@@ -1,4 +1,4 @@
-// lib/jwt.ts
+import { User } from "@/types";
 import jwt, { JsonWebTokenError } from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
@@ -13,14 +13,14 @@ const JWT_OPTIONS = {
 /**
  * Generate JWT token berdasarkan userId
  */
-export function signToken(userId: string): string {
-  return jwt.sign({ userId }, JWT_SECRET, JWT_OPTIONS);
+export function signToken({ id, email, role }: User): string {
+  return jwt.sign({ id, email, role }, JWT_SECRET, JWT_OPTIONS);
 }
 
 /**
  * Verifikasi token dan kembalikan payload valid
  */
-export function verifyToken<T = { userId: string }>(token: string): T | null {
+export function verifyToken<T = User>(token: string): T | null {
   try {
     return jwt.verify(token, JWT_SECRET) as T;
   } catch (err) {

@@ -39,25 +39,19 @@ export async function POST(req: NextRequest) {
       },
       select: {
         id: true,
-        name: true,
         email: true,
         role: true,
       },
     });
 
     // membuat token jwt
-    const token = signToken(newUser.id);
+    const token = signToken(newUser);
 
     // kembalikan response dengan cookies
-    const res = response(201, {
-      id: newUser.id,
-      name: newUser.name,
-      email: newUser.email,
-      role: newUser.role,
-    });
+    const res = response(201, newUser);
 
     res.cookies.set({
-      name: "auth-token",
+      name: "auth_token",
       value: token,
       httpOnly: true,
       secure: APP_ENV === "production",

@@ -1,13 +1,30 @@
 import { db } from "@/lib/db";
 import { response } from "@/lib/response";
-import { getUserIdFromCookie } from "@/lib/verifyToken";
 import { TrashType, Status } from "@/generated/prisma/client";
+import { NextRequest } from "next/server";
+import { verifyToken } from "@/lib/jwt";
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
-    const userId = await getUserIdFromCookie();
+    const token = req.cookies.get("auth_token")?.value;
 
-    if (!userId) return response(401, "Unauthorized");
+    // jika token tidak ada
+    if (!token) {
+      const res = response(401, "Tidak terautentikasi");
+      res.cookies.delete("auth_token");
+
+      return res;
+    }
+
+    const payload = verifyToken(token);
+
+    // jika tidak ada payload atau tidak terverifikasi
+    if (!payload) {
+      const res = response(401, "Tidak terautentikasi");
+      res.cookies.delete("auth_token");
+
+      return res;
+    }
 
     const { searchParams } = new URL(req.url);
 
@@ -15,18 +32,20 @@ export async function GET(req: Request) {
     const limit = parseInt(searchParams.get("limit") || "10");
     const sort = searchParams.get("sort") || "desc";
 
-    // Cast ke enum 
+    // Cast ke enum
     const statusParam = searchParams.get("status");
     const trashTypeParam = searchParams.get("trashType");
 
     const status = statusParam ? (statusParam as Status) : undefined;
-    const trashType = trashTypeParam ? (trashTypeParam as TrashType) : undefined;
+    const trashType = trashTypeParam
+      ? (trashTypeParam as TrashType)
+      : undefined;
 
     const skip = (page - 1) * limit;
 
     const total = await db.transaction.count({
       where: {
-        userId,
+        userId: payload.id,
         ...(status && { status }),
         ...(trashType && { trashType }),
       },
@@ -34,7 +53,7 @@ export async function GET(req: Request) {
 
     const transactions = await db.transaction.findMany({
       where: {
-        userId,
+        userId: payload.id,
         ...(status && { status }),
         ...(trashType && { trashType }),
       },

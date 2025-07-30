@@ -8,7 +8,7 @@ import { changePasswordSchema } from "@/schemas/auth-schema";
 
 export async function POST(req: NextRequest) {
   try {
-    const token = req.cookies.get("auth-token")?.value;
+    const token = req.cookies.get("auth_token")?.value;
     if (!token) return response(401, "Unauthorized");
 
     const session = verifyToken(token);
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     const { oldPassword, newPassword } = validated.data;
 
     const user = await db.user.findUnique({
-      where: { id: session.userId },
+      where: { id: session.id },
     });
 
     if (!user) return response(404, "User tidak ditemukan");

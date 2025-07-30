@@ -1,21 +1,13 @@
+import { User } from "@/types";
 import { create } from "zustand";
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: "USER" | "PETUGAS" | "ADMIN";
-}
 
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isInitialized: boolean;
-  loading: boolean;
   setUser: (user: User | null) => Promise<void>;
   clearUser: () => Promise<void>;
   setInitialized: (value: boolean) => void;
-  setLoading: (value: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -50,5 +42,15 @@ export const useAuthStore = create<AuthState>((set) => ({
     }),
 
   setInitialized: (value) => set({ isInitialized: value }),
-  setLoading: (value) => set({ loading: value }),
 }));
+
+export const useAuthUser = () => useAuthStore((s) => s.user);
+export const useIsAuthenticated = () => useAuthStore((s) => s.isAuthenticated);
+export const useIsInitialized = () => useAuthStore((s) => s.isInitialized);
+
+export const useAuthActions = () => {
+  const setUser = useAuthStore((s) => s.setUser);
+  const clearUser = useAuthStore((s) => s.clearUser);
+  const setInitialized = useAuthStore((s) => s.setInitialized);
+  return { setUser, clearUser, setInitialized };
+};

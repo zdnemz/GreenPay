@@ -7,8 +7,6 @@ import { useForm } from "react-hook-form";
 import z from "zod";
 import axios, { AxiosError } from "axios";
 
-import RootLayout from "@/components/layouts/RootLayout";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -30,12 +28,15 @@ import { loginSchema } from "@/schemas/auth-schema";
 import { toast } from "sonner";
 import { ApiResponse } from "@/lib/response";
 import Link from "next/link";
-import { useAuthStore, User } from "@/store/auth-store";
+import { useAuthActions } from "@/store/auth-store";
 import { useRouter } from "next/navigation";
+import { User } from "@/types";
+import { useAppStore } from "@/store/app-store";
 
 export default function Login() {
   const [isPending, startTransition] = React.useTransition();
-  const { setLoading, setUser } = useAuthStore();
+  const { setUser } = useAuthActions();
+  const setLoading = useAppStore((s) => s.setLoading);
 
   const router = useRouter();
 
@@ -47,7 +48,7 @@ export default function Login() {
   async function onSubmit(values: z.infer<typeof loginSchema>) {
     startTransition(async () => {
       try {
-        setLoading(true);
+        setLoading("login", true);
 
         const { data } = await axios.post<ApiResponse>(
           "/api/auth/login",
@@ -74,7 +75,7 @@ export default function Login() {
           toast.error((error.response?.data as ApiResponse).error as string);
         }
       } finally {
-        setLoading(false);
+        setLoading("login", false);
       }
     });
   }

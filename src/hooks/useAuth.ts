@@ -2,18 +2,21 @@
 
 import * as React from "react";
 import axios, { AxiosError } from "axios";
-import { useAuthStore, User } from "@/store/auth-store";
+import { useAuthActions } from "@/store/auth-store";
 import { ApiResponse } from "@/lib/response";
+import { User } from "@/types";
+import { useAppStore } from "@/store/app-store";
 
 export const useAuthCheck = () => {
-  const { setUser, clearUser, setLoading, setInitialized } = useAuthStore();
+  const { setUser, clearUser, setInitialized } = useAuthActions();
+  const setLoading = useAppStore((s) => s.setLoading);
 
   React.useEffect(() => {
     const checkAuthStatus = async () => {
       try {
-        setLoading(true);
+        setLoading("auth-check", true);
 
-        const { data } = await axios.get<ApiResponse>("/api/users/me");
+        const { data } = await axios.get<ApiResponse>("/api/auth/check");
 
         if (!data.success) {
           await clearUser();
@@ -30,11 +33,12 @@ export const useAuthCheck = () => {
         }
         await clearUser();
       } finally {
-        setLoading(false);
+        setLoading("auth-check", false);
+
         setInitialized(true);
       }
     };
 
     checkAuthStatus();
-  }, [setUser, clearUser, setLoading, setInitialized]);
+  }, [clearUser, setInitialized, setLoading, setUser]);
 };

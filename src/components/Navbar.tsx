@@ -12,7 +12,11 @@ import {
 import GreenPayIcon from "./icons/GreenPay";
 import ToggleTheme from "./ToggleTheme";
 import { Menu, X } from "lucide-react";
-import { useAuthStore } from "@/store/auth-store";
+import {
+  useAuthActions,
+  useAuthStore,
+  useIsAuthenticated,
+} from "@/store/auth-store";
 import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
 import { ApiResponse } from "@/lib/response";
@@ -32,7 +36,8 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [tolerancePadding, setTolerancePadding] = React.useState(0);
 
-  const { isAuthenticated, clearUser } = useAuthStore();
+  const isAuthenticated = useIsAuthenticated();
+  const { clearUser } = useAuthActions();
 
   const router = useRouter();
 

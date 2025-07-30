@@ -9,7 +9,6 @@ import z from "zod";
 import { toast } from "sonner";
 
 import { updateUserSchema } from "@/schemas/user-schema";
-import { useAuthStore, User } from "@/store/auth-store";
 import { ApiResponse } from "@/lib/response";
 
 import { Edit2 } from "lucide-react";
@@ -33,9 +32,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import axios, { AxiosError } from "axios";
+import { UserData } from "@/types";
+import { useAppStore } from "@/store/app-store";
 
-export default function EditProfileDialog() {
-  const { setUser, setLoading, user } = useAuthStore();
+interface EditProfileDialogProps {
+  user: UserData;
+}
+
+export default function EditProfileDialog({ user }: EditProfileDialogProps) {
+  const setLoading = useAppStore((s) => s.setLoading);
 
   const [isPending, startTransition] = React.useTransition();
 
@@ -52,6 +57,7 @@ export default function EditProfileDialog() {
   async function onSubmit(values: z.infer<typeof updateUserSchema>) {
     startTransition(async () => {
       try {
+        setLoading("user-profile-edit", true);
         const { data } = await axios.put<ApiResponse>(
           "/api/users/profile",
           {
@@ -67,10 +73,6 @@ export default function EditProfileDialog() {
           return;
         }
 
-        setLoading(true);
-
-        await setUser(data.data as User);
-
         toast.success("Profile telah diperbarui");
         router.refresh();
       } catch (error) {
@@ -82,7 +84,7 @@ export default function EditProfileDialog() {
 
         toast.error("Terjadi kesalahan");
       } finally {
-        setLoading(false);
+        setLoading("user-profile-edit", false);
       }
     });
   }

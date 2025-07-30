@@ -1,7 +1,8 @@
 "use client";
 
 import { useAuthCheck } from "@/hooks/useAuth";
-import { useAuthStore } from "@/store/auth-store";
+import { useIsInitialized } from "@/store/auth-store";
+import { useAppStore, useIsAnyLoading, useLoadingMap } from "@/store/app-store";
 import Loading from "../Loading";
 import { ReactNode } from "react";
 
@@ -10,12 +11,19 @@ export interface AuthProviderProps {
 }
 
 export default function AuthProvider({ children }: AuthProviderProps) {
-  const { isInitialized, loading } = useAuthStore();
+  const isInitialized = useIsInitialized();
+
+  const isAnyLoading = useIsAnyLoading();
+  const loadingMap = useLoadingMap();
+
   useAuthCheck();
 
-  if (!isInitialized || loading) {
+  console.log(loadingMap);
+  console.log(isAnyLoading);
+
+  if (!isInitialized || isAnyLoading) {
     return <Loading />;
   }
 
-  return children;
+  return <>{children}</>;
 }
