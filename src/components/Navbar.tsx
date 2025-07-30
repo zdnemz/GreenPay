@@ -50,7 +50,10 @@ export default function Navbar() {
         toast.error((data.error as string) || "Terjadi kesalahan");
       }
 
-      await clearUser();
+      setTimeout(() => {
+        clearUser();
+        // router.push("/");
+      }, 200);
 
       router.push("/");
     } catch (error) {
