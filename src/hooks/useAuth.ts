@@ -5,17 +5,20 @@ import axios, { AxiosError } from "axios";
 import { useAuthActions } from "@/store/auth-store";
 import { ApiResponse } from "@/lib/response";
 import { User } from "@/types";
-import { useAppStore } from "@/store/app-store";
+import { useLoadingState } from "@/contexts/loading-context";
 
 export const useAuthCheck = () => {
   const { setUser, clearUser, setInitialized } = useAuthActions();
-  const setLoading = useAppStore((s) => s.setLoading);
+  const { startLoading, stopLoading } = useLoadingState("auth-check");
 
   React.useEffect(() => {
-    const checkAuthStatus = async () => {
-      try {
-        setLoading("auth-check", true);
+    let canceled = false;
 
+    const checkAuthStatus = async () => {
+      if (canceled) return;
+      startLoading();
+
+      try {
         const { data } = await axios.get<ApiResponse>("/api/auth/check");
 
         if (!data.success) {
@@ -33,12 +36,16 @@ export const useAuthCheck = () => {
         }
         await clearUser();
       } finally {
-        setLoading("auth-check", false);
+        stopLoading();
 
         setInitialized(true);
       }
     };
 
     checkAuthStatus();
-  }, [clearUser, setInitialized, setLoading, setUser]);
+
+    return () => {
+      canceled = false;
+    };
+  }, [clearUser, setInitialized, setUser, startLoading, stopLoading]);
 };

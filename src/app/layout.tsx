@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import AuthProvider from "@/components/providers/auth-provider";
+import LoadingProvider from "@/components/providers/loading-provider";
 
 const poppins = Poppins({
   variable: "--font-poppins-sans",
@@ -33,8 +34,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AuthProvider>{children}</AuthProvider>
-          <Toaster />
+          <LoadingProvider>
+            <AuthProvider>
+              {children}
+              <Toaster />
+            </AuthProvider>
+          </LoadingProvider>
         </ThemeProvider>
       </body>
     </html>

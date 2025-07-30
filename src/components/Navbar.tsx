@@ -12,11 +12,7 @@ import {
 import GreenPayIcon from "./icons/GreenPay";
 import ToggleTheme from "./ToggleTheme";
 import { Menu, X } from "lucide-react";
-import {
-  useAuthActions,
-  useAuthStore,
-  useIsAuthenticated,
-} from "@/store/auth-store";
+import { useAuthActions, useIsAuthenticated } from "@/store/auth-store";
 import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
 import { ApiResponse } from "@/lib/response";

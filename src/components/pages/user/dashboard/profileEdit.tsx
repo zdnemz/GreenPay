@@ -33,14 +33,14 @@ import {
 } from "@/components/ui/form";
 import axios, { AxiosError } from "axios";
 import { UserData } from "@/types";
-import { useAppStore } from "@/store/app-store";
+import { useLoadingState } from "@/contexts/loading-context";
 
 interface EditProfileDialogProps {
   user: UserData;
 }
 
 export default function EditProfileDialog({ user }: EditProfileDialogProps) {
-  const setLoading = useAppStore((s) => s.setLoading);
+  const { startLoading, stopLoading } = useLoadingState("user-profile-edit");
 
   const [isPending, startTransition] = React.useTransition();
 
@@ -62,7 +62,7 @@ export default function EditProfileDialog({ user }: EditProfileDialogProps) {
 
     startTransition(async () => {
       try {
-        setLoading("user-profile-edit", true);
+        startLoading();
         const { data } = await axios.put<ApiResponse>(
           "/api/users/profile",
           {
@@ -89,7 +89,7 @@ export default function EditProfileDialog({ user }: EditProfileDialogProps) {
 
         toast.error("Terjadi kesalahan");
       } finally {
-        setLoading("user-profile-edit", false);
+        stopLoading();
       }
     });
   }

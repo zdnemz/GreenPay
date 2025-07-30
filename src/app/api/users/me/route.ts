@@ -2,7 +2,6 @@ import { response } from "@/lib/response";
 import { NextRequest } from "next/server";
 import { verifyToken } from "@/lib/jwt";
 import { db } from "@/lib/db";
-import { Decimal } from "@prisma/client/runtime/library";
 
 export async function GET(req: NextRequest) {
   try {

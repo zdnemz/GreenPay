@@ -17,14 +17,18 @@ import axios, { AxiosError } from "axios";
 import { ApiResponse } from "@/lib/response";
 import { toast } from "sonner";
 import { UserData } from "@/types";
+import { useLoadingState } from "@/contexts/loading-context";
 
 export default function ProfileSection() {
   const [user, setUser] = React.useState<UserData | null>(null);
-  const [hasFetched, setHasFetched] = React.useState(false);
+  const { startLoading, stopLoading } = useLoadingState("user-dashboard");
 
   React.useEffect(() => {
-    if (hasFetched) return;
+    let cancel = true;
+
     async function fetchData() {
+      if (cancel) return;
+      startLoading();
       try {
         const { data } = await axios.get<ApiResponse>("/api/users/me");
 
@@ -40,12 +44,16 @@ export default function ProfileSection() {
           toast.error((error.response?.data as ApiResponse).error as string);
         }
       } finally {
-        setHasFetched(true);
+        stopLoading();
       }
     }
 
     fetchData();
-  }, [hasFetched]);
+
+    return () => {
+      cancel = false;
+    };
+  }, [startLoading, stopLoading]);
 
   return (
     <section>

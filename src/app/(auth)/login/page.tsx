@@ -31,12 +31,12 @@ import Link from "next/link";
 import { useAuthActions } from "@/store/auth-store";
 import { useRouter } from "next/navigation";
 import { User } from "@/types";
-import { useAppStore } from "@/store/app-store";
+import { useLoadingState } from "@/contexts/loading-context";
 
 export default function Login() {
   const [isPending, startTransition] = React.useTransition();
   const { setUser } = useAuthActions();
-  const setLoading = useAppStore((s) => s.setLoading);
+  const { startLoading, stopLoading } = useLoadingState("auth-login");
 
   const router = useRouter();
 
@@ -48,7 +48,7 @@ export default function Login() {
   async function onSubmit(values: z.infer<typeof loginSchema>) {
     startTransition(async () => {
       try {
-        setLoading("login", true);
+        startLoading();
 
         const { data } = await axios.post<ApiResponse>(
           "/api/auth/login",
@@ -75,7 +75,7 @@ export default function Login() {
           toast.error((error.response?.data as ApiResponse).error as string);
         }
       } finally {
-        setLoading("login", false);
+        stopLoading();
       }
     });
   }

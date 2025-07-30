@@ -31,12 +31,12 @@ import Link from "next/link";
 import { useAuthActions } from "@/store/auth-store";
 import { useRouter } from "next/navigation";
 import { User } from "@/types";
-import { useAppStore } from "@/store/app-store";
+import { useLoadingState } from "@/contexts/loading-context";
 
 export default function Register() {
   const [isPending, startTransition] = React.useTransition();
   const { setUser } = useAuthActions();
-  const setLoading = useAppStore((s) => s.setLoading);
+  const { startLoading, stopLoading } = useLoadingState("auth-register");
 
   const router = useRouter();
 
@@ -48,7 +48,7 @@ export default function Register() {
   async function onSubmit(values: z.infer<typeof registerSchema>) {
     startTransition(async () => {
       try {
-        setLoading("register", true);
+        startLoading();
 
         const { data } = await axios.post<ApiResponse>(
           "/api/auth/register",
@@ -75,7 +75,7 @@ export default function Register() {
           toast.error((error.response?.data as ApiResponse).error as string);
         }
       } finally {
-        setLoading("register", false);
+        stopLoading();
       }
     });
   }
