@@ -3,6 +3,8 @@ import { db } from "@/lib/db";
 import { response } from "@/lib/response";
 import { getUserFromSession } from "@/lib/auth";
 import { pointsToBalance } from "@/lib/points";
+import { idTransactionSchema } from "@/schemas/transaction-schema";
+import { treeifyError } from "zod";
 
 export async function PATCH(
   req: NextRequest,
@@ -11,17 +13,25 @@ export async function PATCH(
   try {
     const sessionUser = await getUserFromSession();
 
-    // Validasi user harus PETUGAS
-    if (!sessionUser || !["PETUGAS"].includes(sessionUser.role)) {
-      return response(
-        401,
-        "Hanya petugas atau admin yang dapat menyetujui transaksi",
-      );
+    if (!sessionUser || sessionUser.role !== "PETUGAS") {
+      return response(401, "Hanya petugas yang dapat menyetujui transaksi");
     }
 
-    const { id } = await params;
+    // Await params untuk mendapatkan nilai yang sebenarnya
+    const resolvedParams = await params;
 
-    // Cek apakah transaksi exist dan statusnya PENDING
+    // Validasi ID dengan Zod
+    const parse = idTransactionSchema.safeParse(resolvedParams);
+
+    if (!parse.success) {
+      return response(400, {
+        message: "Validasi gagal",
+        errors: treeifyError(parse.error),
+      });
+    }
+
+    const { id } = parse.data;
+
     const transaction = await db.transaction.findUnique({
       where: { id },
       include: {
@@ -52,7 +62,6 @@ export async function PATCH(
       );
     }
 
-    // Jika petugas, hanya bisa approve transaksi yang dia buat
     if (
       sessionUser.role === "PETUGAS" &&
       transaction.petugasId !== sessionUser.id
@@ -63,12 +72,9 @@ export async function PATCH(
       );
     }
 
-    // Hitung balance yang akan ditambahkan
     const balanceToAdd = pointsToBalance(transaction.points);
 
-    // Update transaksi dan saldo user dalam satu transaksi database
     const result = await db.$transaction(async (prisma) => {
-      // Update status transaksi
       const updatedTransaction = await prisma.transaction.update({
         where: { id },
         data: {
@@ -91,7 +97,6 @@ export async function PATCH(
         },
       });
 
-      // Update saldo user
       const updatedUser = await prisma.user.update({
         where: { id: transaction.userId },
         data: {

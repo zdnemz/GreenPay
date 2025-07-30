@@ -24,3 +24,7 @@ export const createTransactionSchema = z.object({
     )
     .transform((val) => parseFloat(val)),
 });
+
+export const idTransactionSchema = z.object({
+  id: z.string().min(1, "ID transaksi wajib diisi"),
+});

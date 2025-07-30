@@ -2,6 +2,8 @@ import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { response } from "@/lib/response";
 import { getUserFromSession } from "@/lib/auth";
+import { idTransactionSchema } from "@/schemas/transaction-schema";
+import { treeifyError } from "zod";
 
 export async function PATCH(
   req: NextRequest,
@@ -10,31 +12,28 @@ export async function PATCH(
   try {
     const sessionUser = await getUserFromSession();
 
-    // Validasi hanya PETUGAS yang boleh reject
-    if (!sessionUser || !["PETUGAS"].includes(sessionUser.role)) {
-      return response(
-        401,
-        "Hanya petugas atau admin yang dapat menolak transaksi",
-      );
+    if (!sessionUser || sessionUser.role !== "PETUGAS") {
+      return response(401, "Hanya petugas yang dapat menolak transaksi");
     }
 
-    const { id } = await params;
+    const parsed = idTransactionSchema.safeParse(params);
+    if (!parsed.success) {
+      return response(400, {
+        message: "Validasi gagal",
+        errors: treeifyError(parsed.error),
+      });
+    }
 
-    // Cek apakah transaksi exist dan masih PENDING
+    const { id } = parsed.data;
+
     const transaction = await db.transaction.findUnique({
       where: { id },
       include: {
         user: {
-          select: {
-            id: true,
-            name: true,
-          },
+          select: { id: true, name: true },
         },
         petugas: {
-          select: {
-            id: true,
-            name: true,
-          },
+          select: { id: true, name: true },
         },
       },
     });
@@ -50,41 +49,24 @@ export async function PATCH(
       );
     }
 
-    // Petugas hanya bisa menolak transaksi yang dia buat
-    if (
-      sessionUser.role === "PETUGAS" &&
-      transaction.petugasId !== sessionUser.id
-    ) {
+    if (transaction.petugasId !== sessionUser.id) {
       return response(
         403,
         "Anda hanya bisa menolak transaksi yang Anda buat sendiri",
       );
     }
 
-    // Update status transaksi menjadi REJECTED
     const updatedTransaction = await db.transaction.update({
       where: { id },
-      data: {
-        status: "REJECTED",
-      },
+      data: { status: "REJECTED" },
       include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        petugas: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
+        user: { select: { id: true, name: true } },
+        petugas: { select: { id: true, name: true } },
       },
     });
 
     return response(200, {
-      message: `Transaksi berhasil ditolak.`,
+      message: "Transaksi berhasil ditolak.",
       transaction: updatedTransaction,
     });
   } catch (error) {
