@@ -25,7 +25,7 @@ export const useAuthCheck = () => {
 
         await setUser(data.data as User);
       } catch (error) {
-        if (error instanceof AxiosError) {
+        if (error instanceof AxiosError && error.response?.status !== 401) {
           console.error(
             "Auth check failed:",
             (error.response?.data as ApiResponse).error,
