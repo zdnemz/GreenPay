@@ -55,13 +55,18 @@ export default function EditProfileDialog({ user }: EditProfileDialogProps) {
   const router = useRouter();
 
   async function onSubmit(values: z.infer<typeof updateUserSchema>) {
+    const cleanedValues = {
+      name: values.name?.trim() || undefined,
+      email: values.email?.trim() || undefined,
+    };
+
     startTransition(async () => {
       try {
         setLoading("user-profile-edit", true);
         const { data } = await axios.put<ApiResponse>(
           "/api/users/profile",
           {
-            ...values,
+            ...cleanedValues,
           },
           {
             withCredentials: true,

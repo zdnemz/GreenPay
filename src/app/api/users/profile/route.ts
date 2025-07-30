@@ -15,7 +15,6 @@ export async function PUT(req: NextRequest) {
 
     const data = await req.json();
 
-    // Validasi input
     const validated = await validate(updateUserSchema, data);
     if (!validated.success) {
       return response(400, validated.error);
@@ -23,19 +22,27 @@ export async function PUT(req: NextRequest) {
 
     const { name, email } = validated.data;
 
-    const isEmailExist = await db.user.count({ where: { email } });
+    // Cek apakah email ingin diubah
+    if (email) {
+      const isEmailExist = await db.user.count({
+        where: {
+          email,
+          NOT: { id: session.id },
+        },
+      });
 
-    if (isEmailExist) return response(400, "Email sudah terdaftar");
+      if (isEmailExist) return response(400, "Email sudah terdaftar");
+    }
 
     await db.user.update({
       where: { id: session.id },
       data: {
-        name,
-        email,
+        ...(name && { name }),
+        ...(email && { email }),
       },
     });
 
-    return response(200, "Profil berhasil di update");
+    return response(200, "Profil berhasil diupdate");
   } catch (err) {
     console.error(`Error updating user : ${(err as Error).message}`);
     return response(500, "Server error");
