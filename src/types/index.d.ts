@@ -17,7 +17,7 @@ export interface UserData {
   rank: number;
 }
 
-export interface leaderboardData {
+export interface LeaderboardData {
   users: {
     rank: number;
     id: string;
@@ -29,4 +29,19 @@ export interface leaderboardData {
   myPoints: number;
   role: "USER";
   page: number;
+}
+
+export interface TransactionData {
+  data: {
+    id: string;
+    createdAt: Date;
+    userId: string;
+    petugasId: string | null;
+    trashType: TrashType;
+    points: number;
+    status: Status;
+  }[];
+  page: number;
+  total: number;
+  totalPages: number;
 }

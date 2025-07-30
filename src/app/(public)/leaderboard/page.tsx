@@ -10,14 +10,14 @@ import Navbar from "@/components/Navbar";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { ApiResponse } from "@/lib/response";
-import { leaderboardData } from "@/types";
+import { LeaderboardData } from "@/types";
 import axios, { AxiosError } from "axios";
 import Image from "next/image";
 import * as React from "react";
 import { toast } from "sonner";
 
 export default function Leaderboard() {
-  const [leaderboard, setLeaderboard] = React.useState<leaderboardData>();
+  const [leaderboard, setLeaderboard] = React.useState<LeaderboardData>();
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -28,7 +28,7 @@ export default function Leaderboard() {
       try {
         const { data } = await axios.get<ApiResponse>("/api/leaderboard");
 
-        setLeaderboard(data.data as leaderboardData);
+        setLeaderboard(data.data as LeaderboardData);
       } catch (error) {
         if (error instanceof AxiosError) {
           console.error("Login error:", error);
@@ -47,8 +47,6 @@ export default function Leaderboard() {
   }, []);
 
   if (loading || !leaderboard) return <Loading />;
-
-  console.log(leaderboard);
 
   return (
     <RootLayout header={<Navbar />} footer={<Footer />}>

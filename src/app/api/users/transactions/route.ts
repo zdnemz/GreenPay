@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
       take: limit,
     });
 
-    return Response.json({
+    return response(200, {
       data: transactions,
       page,
       total,
