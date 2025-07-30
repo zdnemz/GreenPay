@@ -3,7 +3,6 @@ import { NextRequest } from "next/server";
 import { verifyToken } from "@/lib/jwt";
 import { db } from "@/lib/db";
 import { Decimal } from "@prisma/client/runtime/library";
-import { UserData } from "@/types";
 
 export async function GET(req: NextRequest) {
   try {
@@ -11,16 +10,13 @@ export async function GET(req: NextRequest) {
     if (!token) {
       const res = response(401, "Tidak terautentikasi");
       res.cookies.delete("auth_token");
-
       return res;
     }
 
     const payload = verifyToken(token);
-
     if (!payload) {
       const res = response(401, "Tidak terautentikasi");
       res.cookies.delete("auth_token");
-
       return res;
     }
 
@@ -36,21 +32,31 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // dummy
-    // const user: UserData = {
-    //   id: "user_12345",
-    //   name: "John Doe",
-    //   email: "johndoe@example.com",
-    //   balance: new Decimal(150000),
-    //   role: "USER",
-    //   createdAt: new Date("2024-05-01T10:30:00Z"),
-    // };
+    if (!user) return response(404, "Pengguna tidak ditemukan");
 
-    if (!user) {
-      return response(404, "Pengguna tidak ditemukan");
-    }
+    // Hitung total points semua user
+    const allPoints = await db.transaction.groupBy({
+      by: ["userId"],
+      _sum: {
+        points: true,
+      },
+      orderBy: {
+        _sum: {
+          points: "desc",
+        },
+      },
+    });
 
-    return response(200, user);
+    const pointEntry = allPoints.find((p) => p.userId === user.id);
+    const userPoints = pointEntry?._sum.points ?? 0;
+    let rank = allPoints.findIndex((p) => p.userId === user.id);
+    rank = rank === -1 ? allPoints.length + 1 : rank + 1;
+
+    return response(200, {
+      ...user,
+      points: userPoints,
+      rank,
+    });
   } catch (err) {
     console.error(`Error getting current user : ${(err as Error).message}`);
     return response(500, "Terjadi kesalahan server");

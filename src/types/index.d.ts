@@ -13,4 +13,6 @@ export interface UserData {
   balance: Decimal;
   role: User["role"];
   createdAt: Date;
+  points: number;
+  rank: number;
 }

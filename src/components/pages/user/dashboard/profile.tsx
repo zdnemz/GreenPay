@@ -85,11 +85,11 @@ export default function ProfileSection() {
                         <Info className="h-4 w-4" />
                       </TooltipTrigger>
                       <TooltipContent className="max-w-48 text-center">
-                        <p>Lorem ipsum dolor sit amet consectetur.</p>
+                        <p>jumlah poin yang terkumpul</p>
                       </TooltipContent>
                     </Tooltip>
                   </p>
-                  <h3>1880 pts.</h3>
+                  <h3>{user?.points} pts.</h3>
                 </div>
                 <div>
                   <p className="text-muted-foreground flex items-center gap-x-1 text-sm">
@@ -97,7 +97,8 @@ export default function ProfileSection() {
                     <Trophy className="h-4 w-4" />
                   </p>
                   <h3 className="flex items-center gap-x-1">
-                    1 st <ChevronUp className="text-primary h-4 w-4" />
+                    {user?.rank} st{" "}
+                    <ChevronUp className="text-primary h-4 w-4" />
                   </h3>
                 </div>
               </div>
@@ -121,7 +122,13 @@ export default function ProfileSection() {
             <div>
               <h3>Dibuat pada</h3>
               <p className="text-muted-foreground text-sm">
-                {user?.createdAt.toLocaleString()}
+                {user?.createdAt
+                  ? new Intl.DateTimeFormat("id-ID", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    }).format(new Date(user.createdAt))
+                  : "-"}
               </p>
             </div>
           </div>
