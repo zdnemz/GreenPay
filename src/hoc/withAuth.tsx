@@ -9,12 +9,12 @@ import {
   useAuthUser,
   useIsAuthenticated,
   useIsInitialized,
-} from "@/store/auth-store";
+} from "@/stores/auth-store";
 import { User } from "@/generated/prisma/client";
 import { Button } from "@/components/ui/button";
 import RootLayout from "@/components/layouts/RootLayout";
 import Loading from "@/components/Loading";
-import { useLoading } from "@/contexts/loading-context";
+import { useLoading } from "@/hooks/useLoading";
 
 export const withAuth = <P extends object>(
   Component: React.ComponentType<P>,

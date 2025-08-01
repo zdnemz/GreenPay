@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { response } from "@/lib/response";
-import { getUserFromSession } from "@/lib/auth";
+import { getUserFromSession } from "@/lib/session";
 import { calculatePoints, POINTS_CONFIG } from "@/lib/points";
 import { createTransactionSchema } from "@/schemas/transaction-schema";
 import { validate } from "@/lib/validate";

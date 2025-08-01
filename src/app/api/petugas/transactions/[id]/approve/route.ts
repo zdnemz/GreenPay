@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { response } from "@/lib/response";
-import { getUserFromSession } from "@/lib/auth";
+import { getUserFromSession } from "@/lib/session";
 import { pointsToBalance } from "@/lib/points";
 import { idTransactionSchema } from "@/schemas/transaction-schema";
 import { treeifyError } from "zod";

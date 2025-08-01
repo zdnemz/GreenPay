@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { getUserFromSession } from "@/lib/auth";
+import { getUserFromSession } from "@/lib/session";
 import { response } from "@/lib/response";
 import { Status } from "@/generated/prisma/client";
 

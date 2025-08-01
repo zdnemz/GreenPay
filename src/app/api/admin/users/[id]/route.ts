@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { NextRequest } from "next/server";
-import { getUserFromSession } from "@/lib/auth";
+import { getUserFromSession } from "@/lib/session";
 import { response } from "@/lib/response";
 import { validate } from "@/lib/validate";
 import { UserUpdateSchema } from "@/schemas/admin-schema";

@@ -5,10 +5,10 @@ import First from "@/components/icons/ranks/First";
 import Second from "@/components/icons/ranks/Second";
 import Third from "@/components/icons/ranks/Third";
 import RootLayout from "@/components/layouts/RootLayout";
-import Loading from "@/components/Loading";
 import Navbar from "@/components/Navbar";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
+import { useLoading } from "@/hooks/useLoading";
 import { APP_ENV } from "@/lib/config";
 import { ApiResponse } from "@/lib/response";
 import { LeaderboardData } from "@/types";
@@ -48,15 +48,15 @@ const MOCK_DATA =
 
 export default function Leaderboard() {
   const [leaderboard, setLeaderboard] = React.useState<LeaderboardData>();
-  const [loading, setLoading] = React.useState(true);
+  const { startLoading, stopLoading } = useLoading("leaderboard");
 
   React.useEffect(() => {
     let canceled = true;
 
-    if (!canceled) return;
-
     async function fetchData() {
+      if (!canceled) return;
       try {
+        startLoading();
         if (APP_ENV == "development") {
           setLeaderboard(MOCK_DATA as LeaderboardData);
           return;
@@ -71,7 +71,7 @@ export default function Leaderboard() {
           toast.error((error.response?.data as ApiResponse).error as string);
         }
       } finally {
-        setLoading(false);
+        stopLoading();
       }
     }
 
@@ -80,9 +80,7 @@ export default function Leaderboard() {
     return () => {
       canceled = false;
     };
-  }, []);
-
-  if (loading || !leaderboard) return <Loading />;
+  }, [startLoading, stopLoading]);
 
   return (
     <RootLayout header={<Navbar />} footer={<Footer />}>
@@ -113,10 +111,10 @@ export default function Leaderboard() {
                 </div>
                 <div className="mt-6 max-w-24 text-center">
                   <h2 className="truncate text-xl font-semibold">
-                    {leaderboard.users[1].name}
+                    {leaderboard?.users[1].name}
                   </h2>
                   <h3 className="text-primary text-2xl font-semibold">
-                    {leaderboard.users[1].points} pts
+                    {leaderboard?.users[1].points} pts
                   </h3>
                 </div>
               </div>
@@ -135,10 +133,10 @@ export default function Leaderboard() {
                 </div>
                 <div className="mt-6 max-w-24 text-center">
                   <h2 className="truncate text-xl font-semibold">
-                    {leaderboard.users[0].name}
+                    {leaderboard?.users[0].name}
                   </h2>
                   <h3 className="text-primary text-2xl font-semibold">
-                    {leaderboard.users[0].points} pts
+                    {leaderboard?.users[0].points} pts
                   </h3>
                 </div>
               </div>
@@ -157,10 +155,10 @@ export default function Leaderboard() {
                 </div>
                 <div className="mt-6 max-w-24 text-center">
                   <h2 className="truncate text-xl font-semibold">
-                    {leaderboard.users[2].name}
+                    {leaderboard?.users[2].name}
                   </h2>
                   <h3 className="text-primary text-2xl font-semibold">
-                    {leaderboard.users[2].points} pts
+                    {leaderboard?.users[2].points} pts
                   </h3>
                 </div>
               </div>
@@ -168,7 +166,7 @@ export default function Leaderboard() {
 
             {/* other ranks */}
             <div className="space-y-3">
-              {leaderboard.users.slice(3).map((user) => (
+              {leaderboard?.users.slice(3).map((user) => (
                 <Card key={user.id} className="p-6">
                   <div className="flex justify-between">
                     <div className="flex items-center gap-3">

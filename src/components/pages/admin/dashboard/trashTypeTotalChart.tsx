@@ -18,7 +18,7 @@ import {
 import { AdminAnalyticData } from "@/types";
 
 interface Props {
-  data: AdminAnalyticData["totalSampah"];
+  data: AdminAnalyticData["totalSampah"] | undefined;
 }
 
 const COLORS = [
@@ -31,7 +31,7 @@ const COLORS = [
 ]; // Tambah sesuai kebutuhan
 
 export default function TrashTypeTotalChart({ data }: Props) {
-  const chartData = data.map((item) => ({
+  const chartData = data?.map((item) => ({
     name: item.type,
     value: item.total,
   }));
@@ -57,7 +57,7 @@ export default function TrashTypeTotalChart({ data }: Props) {
               dataKey="value"
               stroke="none"
             >
-              {chartData.map((_, index) => (
+              {chartData?.map((_, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={COLORS[index % COLORS.length]}

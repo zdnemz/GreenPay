@@ -2,14 +2,14 @@
 
 import * as React from "react";
 import axios, { AxiosError } from "axios";
-import { useAuthActions } from "@/store/auth-store";
+import { useAuthActions } from "@/stores/auth-store";
 import { ApiResponse } from "@/lib/response";
 import { User } from "@/types";
-import { useLoadingState } from "@/contexts/loading-context";
+import { useLoading } from "@/hooks/useLoading";
 
 export const useAuthCheck = () => {
   const { setUser, clearUser, setInitialized } = useAuthActions();
-  const { startLoading, stopLoading } = useLoadingState("auth-check");
+  const { startLoading, stopLoading } = useLoading("auth-check");
 
   React.useEffect(() => {
     let canceled = false;

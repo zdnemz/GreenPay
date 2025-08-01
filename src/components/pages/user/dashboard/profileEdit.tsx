@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/form";
 import axios, { AxiosError } from "axios";
 import { UserData } from "@/types";
-import { useLoadingState } from "@/contexts/loading-context";
+import { useLoading } from "@/hooks/useLoading";
 
 interface EditProfileDialogProps {
   user: UserData;
@@ -43,7 +43,7 @@ export default function EditProfileDialog({
   user,
   onSuccess,
 }: EditProfileDialogProps) {
-  const { startLoading, stopLoading } = useLoadingState("user-profile-edit");
+  const { startLoading, stopLoading } = useLoading("user-profile-edit");
 
   const [isPending, startTransition] = React.useTransition();
 

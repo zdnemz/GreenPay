@@ -6,7 +6,7 @@ import * as React from "react";
 export default function Statistic({
   data: analytics,
 }: {
-  data: AdminAnalyticData;
+  data: AdminAnalyticData | undefined;
 }) {
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
@@ -17,7 +17,7 @@ export default function Statistic({
           </div>
           <div className="space-y-1">
             <h4 className="text-primary text-xl font-semibold">
-              {analytics.totalUser}
+              {analytics?.totalUser}
             </h4>
             <p className="text-muted-foreground text-sm">Total User</p>
           </div>
@@ -30,7 +30,7 @@ export default function Statistic({
           </div>
           <div className="space-y-1">
             <h4 className="text-primary text-xl font-semibold">
-              {analytics.totalPetugas}
+              {analytics?.totalPetugas}
             </h4>
             <p className="text-muted-foreground text-sm">Total Petugas</p>
           </div>
@@ -43,7 +43,10 @@ export default function Statistic({
           </div>
           <div className="space-y-1">
             <h4 className="text-primary text-xl font-semibold">
-              {analytics.totalSampah.reduce((acc, item) => acc + item.total, 0)}
+              {analytics?.totalSampah.reduce(
+                (acc, item) => acc + item.total,
+                0,
+              )}
             </h4>
             <p className="text-muted-foreground text-sm">Total Sampah</p>
           </div>
@@ -56,7 +59,7 @@ export default function Statistic({
           </div>
           <div className="space-y-1">
             <h4 className="text-primary text-xl font-semibold">
-              {analytics.totalTransaksi}
+              {analytics?.totalTransaksi}
             </h4>
             <p className="text-muted-foreground text-sm">Total Transaksi</p>
           </div>

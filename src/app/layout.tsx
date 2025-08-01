@@ -36,8 +36,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
+        style={{ overflow: "hidden" }}
         className={`${poppins.className} antialiased`}
-        suppressHydrationWarning
       >
         <ThemeProvider
           attribute="class"

@@ -2,7 +2,6 @@
 
 import Footer from "@/components/Footer";
 import RootLayout from "@/components/layouts/RootLayout";
-import Loading from "@/components/Loading";
 import Navbar from "@/components/Navbar";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -13,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useLoading } from "@/hooks/useLoading";
 import { ApiResponse } from "@/lib/response";
 import { TransactionData } from "@/types";
 import axios, { AxiosError } from "axios";
@@ -21,13 +21,15 @@ import { toast } from "sonner";
 
 export default function Transactions() {
   const [transactions, setTransactions] = React.useState<TransactionData>();
-  const [loading, setLoading] = React.useState(true);
+  const { startLoading, stopLoading } = useLoading("user-transaction");
 
   React.useEffect(() => {
     let canceled = true;
 
-    if (!canceled) return;
     async function fetchData() {
+      if (!canceled) return;
+
+      startLoading();
       try {
         const { data } = await axios.get<ApiResponse>(
           "/api/users/transactions",
@@ -40,7 +42,7 @@ export default function Transactions() {
           toast.error((error.response?.data as ApiResponse).error as string);
         }
       } finally {
-        setLoading(false);
+        stopLoading();
       }
     }
 
@@ -49,9 +51,7 @@ export default function Transactions() {
     return () => {
       canceled = false;
     };
-  }, []);
-
-  if (loading || !transactions) return <Loading />;
+  }, [startLoading, stopLoading]);
 
   return (
     <RootLayout header={<Navbar />} footer={<Footer />}>
@@ -78,7 +78,7 @@ export default function Transactions() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {transactions.data.map((tx) => (
+              {transactions?.data.map((tx) => (
                 <TableRow key={tx.id}>
                   <TableCell>{tx.id}</TableCell>
                   <TableCell>{tx.userId}</TableCell>

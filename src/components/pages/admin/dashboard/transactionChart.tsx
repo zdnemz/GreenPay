@@ -19,11 +19,11 @@ import {
 } from "recharts";
 
 interface Props {
-  data: AdminAnalyticData["transaksiPerBulan"];
+  data: AdminAnalyticData["transaksiPerBulan"] | undefined;
 }
 
 export default function TransactionChart({ data }: Props) {
-  const formattedData = data.map((item) => ({
+  const formattedData = data?.map((item) => ({
     label: `${item.bulan.toString().padStart(2, "0")}/${item.tahun}`,
     jumlah: item.jumlah,
   }));

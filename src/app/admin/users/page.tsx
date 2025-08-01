@@ -3,7 +3,6 @@
 import * as React from "react";
 import Footer from "@/components/Footer";
 import RootLayout from "@/components/layouts/RootLayout";
-import Loading from "@/components/Loading";
 import Navbar from "@/components/Navbar";
 import {
   Table,
@@ -20,17 +19,20 @@ import { toast } from "sonner";
 import { EditUserDialog } from "@/components/pages/admin/users/editUser";
 import { Card } from "@/components/ui/card";
 import { DeleteUserDialog } from "@/components/pages/admin/users/deleteUser";
+import { useLoading } from "@/hooks/useLoading";
 
 export default function Users() {
   const [users, setUsers] = React.useState<(User & { createdAt: Date })[]>();
-  const [loading, setLoading] = React.useState(true);
+  const { startLoading, stopLoading } = useLoading("admin-users");
   const [refreshKey, setRefreshKey] = React.useState(0);
 
   React.useEffect(() => {
     let canceled = true;
 
-    if (!canceled) return;
     async function fetchData() {
+      if (!canceled) return;
+
+      startLoading();
       try {
         const { data } = await axios.get<ApiResponse>("/api/admin/users");
         setUsers(data.data as (User & { createdAt: Date })[]);
@@ -40,7 +42,7 @@ export default function Users() {
           toast.error((error.response?.data as ApiResponse).error as string);
         }
       } finally {
-        setLoading(false);
+        stopLoading();
       }
     }
 
@@ -48,9 +50,7 @@ export default function Users() {
     return () => {
       canceled = false;
     };
-  }, [refreshKey]);
-
-  if (loading || !users) return <Loading />;
+  }, [refreshKey, startLoading, stopLoading]);
 
   return (
     <RootLayout header={<Navbar />} footer={<Footer />}>
@@ -76,7 +76,7 @@ export default function Users() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users.map((user) => (
+              {users?.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell>{user.id}</TableCell>
                   <TableCell>{user.email}</TableCell>

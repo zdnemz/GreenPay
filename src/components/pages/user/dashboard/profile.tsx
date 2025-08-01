@@ -17,42 +17,41 @@ import axios, { AxiosError } from "axios";
 import { ApiResponse } from "@/lib/response";
 import { toast } from "sonner";
 import { UserData } from "@/types";
-import Loading from "@/components/Loading";
 import ChangePasswordDialog from "./changePassword";
+import { useLoading } from "@/hooks/useLoading";
 
 export default function ProfileSection() {
   const [user, setUser] = React.useState<UserData | null>(null);
-  const [loading, setLoading] = React.useState(true);
-
-  async function fetchData() {
-    try {
-      setLoading(true);
-      const { data } = await axios.get<ApiResponse>("/api/users/me");
-
-      setUser(data.data as UserData);
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        console.error("Profile error:", error);
-        toast.error((error.response?.data as ApiResponse).error as string);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
+  const [refreshKey, setRefreshKey] = React.useState<number>(0);
+  const { startLoading, stopLoading } = useLoading("user-dashboard");
 
   React.useEffect(() => {
     let canceled = true;
 
-    if (!canceled) return;
+    async function fetchData() {
+      try {
+        if (!canceled) return;
+
+        startLoading();
+        const { data } = await axios.get<ApiResponse>("/api/users/me");
+
+        setUser(data.data as UserData);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          console.error("Profile error:", error);
+          toast.error((error.response?.data as ApiResponse).error as string);
+        }
+      } finally {
+        stopLoading();
+      }
+    }
 
     fetchData();
 
     return () => {
       canceled = false;
     };
-  }, []);
-
-  if (loading) return <Loading />;
+  }, [refreshKey, startLoading, stopLoading]);
 
   return (
     <section>
@@ -113,7 +112,10 @@ export default function ProfileSection() {
 
             <div className="w-full space-x-3 sm:w-auto">
               <ChangePasswordDialog />
-              <EditProfileDialog user={user!} onSuccess={fetchData} />
+              <EditProfileDialog
+                user={user!}
+                onSuccess={() => setRefreshKey((v) => v + 1)}
+              />
             </div>
           </div>
 

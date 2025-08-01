@@ -4,7 +4,7 @@ import { response } from "@/lib/response";
 import { db } from "@/lib/db";
 import { validate } from "@/lib/validate";
 import { registerSchema } from "@/schemas/auth-schema";
-import { getUserFromSession } from "@/lib/auth";
+import { getUserFromSession } from "@/lib/session";
 
 export async function GET() {
   const sessionUser = await getUserFromSession();

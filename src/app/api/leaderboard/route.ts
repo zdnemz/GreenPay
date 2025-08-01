@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { getUserFromSession } from "@/lib/auth";
+import { getUserFromSession } from "@/lib/session";
 import { response } from "@/lib/response";
 import { NextRequest } from "next/server";
 import { convertBigInt } from "@/lib/utils";

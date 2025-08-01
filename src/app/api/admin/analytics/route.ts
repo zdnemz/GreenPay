@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { getUserFromSession } from "@/lib/auth";
+import { getUserFromSession } from "@/lib/session";
 import { response } from "@/lib/response";
 import { Role, Status } from "@/generated/prisma/client";
 import { POINTS_CONFIG } from "@/lib/points";

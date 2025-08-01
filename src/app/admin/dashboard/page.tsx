@@ -2,19 +2,19 @@
 
 import * as React from "react";
 import RootLayout from "@/components/layouts/RootLayout";
-import { useAuthUser } from "@/store/auth-store";
+import { useAuthUser } from "@/stores/auth-store";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { AdminAnalyticData } from "@/types";
 import { ApiResponse } from "@/lib/response";
 import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
-import Loading from "@/components/Loading";
 import TransactionGraphics from "@/components/pages/admin/dashboard/transactionChart";
 import TransactionStatusChart from "@/components/pages/admin/dashboard/transactionStatusChart";
 import { APP_ENV } from "@/lib/config";
 import TrashTypeTotalChart from "@/components/pages/admin/dashboard/trashTypeTotalChart";
 import Statistic from "@/components/pages/admin/dashboard/statictic";
+import { useLoading } from "@/hooks/useLoading";
 
 // mock data for development
 const MOCK_DATA: AdminAnalyticData | null =
@@ -59,14 +59,17 @@ export default function Dashboard() {
   const user = useAuthUser();
 
   const [analytics, setanalytics] = React.useState<AdminAnalyticData>();
-  const [loading, setLoading] = React.useState(true);
+  const { startLoading, stopLoading } = useLoading("admin-dashboard");
 
   React.useEffect(() => {
     let canceled = true;
 
-    if (!canceled) return;
     async function fetchData() {
       try {
+        if (!canceled) return;
+
+        startLoading();
+
         if (APP_ENV == "development") {
           setanalytics(MOCK_DATA as AdminAnalyticData);
           return;
@@ -81,7 +84,7 @@ export default function Dashboard() {
           toast.error((error.response?.data as ApiResponse).error as string);
         }
       } finally {
-        setLoading(false);
+        stopLoading();
       }
     }
 
@@ -90,9 +93,7 @@ export default function Dashboard() {
     return () => {
       canceled = false;
     };
-  }, []);
-
-  if (loading || !analytics) return <Loading />;
+  }, [startLoading, stopLoading]);
 
   return (
     <RootLayout header={<Navbar />} footer={<Footer />}>
@@ -109,13 +110,13 @@ export default function Dashboard() {
 
           <div className="grid gap-6 md:grid-cols-2">
             <div className="md:col-span-2">
-              <TransactionGraphics data={analytics.transaksiPerBulan} />
+              <TransactionGraphics data={analytics?.transaksiPerBulan} />
             </div>
             <div className="md:col-span-1">
-              <TransactionStatusChart data={analytics.transaksiStatus} />
+              <TransactionStatusChart data={analytics?.transaksiStatus} />
             </div>
             <div className="md:col-span-1">
-              <TrashTypeTotalChart data={analytics.totalSampah} />
+              <TrashTypeTotalChart data={analytics?.totalSampah} />
             </div>
           </div>
         </div>

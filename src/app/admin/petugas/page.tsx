@@ -3,7 +3,6 @@
 import * as React from "react";
 import Footer from "@/components/Footer";
 import RootLayout from "@/components/layouts/RootLayout";
-import Loading from "@/components/Loading";
 import Navbar from "@/components/Navbar";
 import {
   Table,
@@ -21,19 +20,22 @@ import { Card } from "@/components/ui/card";
 import { EditPetugasDialog } from "@/components/pages/admin/petugas/editPetugas";
 import { DeleteUserDialog } from "@/components/pages/admin/users/deleteUser";
 import { AddPetugasDialog } from "@/components/pages/admin/petugas/addPetugas";
+import { useLoading } from "@/hooks/useLoading";
 
 export default function Petugas() {
   const [petugas, setPetugas] =
     React.useState<(User & { createdAt: Date })[]>();
-  const [loading, setLoading] = React.useState(true);
+  const { startLoading, stopLoading } = useLoading("admin-petugas");
   const [refreshKey, setRefreshKey] = React.useState(0);
 
   React.useEffect(() => {
     let canceled = true;
 
-    if (!canceled) return;
     async function fetchData() {
       try {
+        if (!canceled) return;
+
+        startLoading();
         const { data } = await axios.get<ApiResponse>("/api/admin/petugas");
         setPetugas(data.data as (User & { createdAt: Date })[]);
       } catch (error) {
@@ -42,7 +44,7 @@ export default function Petugas() {
           toast.error((error.response?.data as ApiResponse).error as string);
         }
       } finally {
-        setLoading(false);
+        stopLoading();
       }
     }
 
@@ -50,9 +52,7 @@ export default function Petugas() {
     return () => {
       canceled = false;
     };
-  }, [refreshKey]);
-
-  if (loading || !petugas) return <Loading />;
+  }, [refreshKey, startLoading, stopLoading]);
 
   return (
     <RootLayout header={<Navbar />} footer={<Footer />}>
@@ -80,7 +80,7 @@ export default function Petugas() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {petugas.map((user) => (
+              {petugas?.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell>{user.id}</TableCell>
                   <TableCell>{user.email}</TableCell>

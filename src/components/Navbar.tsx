@@ -16,7 +16,7 @@ import {
   useAuthActions,
   useAuthUser,
   useIsAuthenticated,
-} from "@/store/auth-store";
+} from "@/stores/auth-store";
 import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
 import { ApiResponse } from "@/lib/response";
@@ -31,6 +31,7 @@ import {
   DialogTrigger,
   DialogClose,
 } from "./ui/dialog";
+import { lockScroll, unlockScroll } from "@/lib/scroll";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -66,17 +67,19 @@ export default function Navbar() {
 
   React.useEffect(() => {
     if (isMenuOpen) {
+      lockScroll();
+
       const scrollBarWidth =
         window.innerWidth - document.documentElement.clientWidth;
-      document.body.style.overflow = "hidden";
       setTolerancePadding(scrollBarWidth);
     } else {
-      document.body.style.overflow = "auto";
+      unlockScroll();
+
       setTolerancePadding(0);
     }
 
     return () => {
-      document.body.style.overflowY = "auto";
+      unlockScroll();
     };
   }, [isMenuOpen]);
 

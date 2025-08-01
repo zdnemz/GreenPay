@@ -28,15 +28,15 @@ import { loginSchema } from "@/schemas/auth-schema";
 import { toast } from "sonner";
 import { ApiResponse } from "@/lib/response";
 import Link from "next/link";
-import { useAuthActions } from "@/store/auth-store";
+import { useAuthActions } from "@/stores/auth-store";
 import { useRouter } from "next/navigation";
 import { User } from "@/types";
-import { useLoadingState } from "@/contexts/loading-context";
+import { useLoading } from "@/hooks/useLoading";
 
 export default function Login() {
   const [isPending, startTransition] = React.useTransition();
   const { setUser } = useAuthActions();
-  const { startLoading, stopLoading } = useLoadingState("auth-login");
+  const { startLoading, stopLoading } = useLoading("auth-login");
 
   const router = useRouter();
 
