@@ -1,23 +1,25 @@
-export type Pagination = {
+import { Role, Status, TrashType } from "@/generated/prisma";
+
+export interface Pagination {
   page: number;
   limit: number;
   total: number;
   totalPages: number;
-};
+}
 
-export type ApiResponse<T = unknown> = {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   message: string;
   data?: T | null;
   pagination?: Pagination;
   error?: unknown;
-};
+}
 
 export interface User {
   id: string;
   email: string;
   name: string;
-  role: "USER" | "PETUGAS" | "ADMIN";
+  role: Role;
 }
 
 export interface UserData {
@@ -27,7 +29,7 @@ export interface UserData {
   points: number;
   currentRank: number | null;
   lastRank: number | null;
-  role: User["role"];
+  role: Role;
   createdAt: Date;
 }
 
@@ -41,7 +43,7 @@ export interface LeaderboardData {
   }[];
   myRank: number;
   myPoints: number;
-  role: "USER";
+  role: Role.USER;
   page: number;
 }
 

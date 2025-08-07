@@ -61,14 +61,10 @@ export default function Transactions() {
                   <TableCell>
                     <Badge
                       variant={
-                        tx.status === "Disetujui"
-                          ? "default"
-                          : tx.status === "Ditolak"
-                            ? "destructive"
-                            : "secondary"
+                        tx.status === "APPROVED" ? "default" : "destructive"
                       }
                     >
-                      {tx.status}
+                      {tx.status === "APPROVED" ? "Disetujui" : "Ditolak"}
                     </Badge>
                   </TableCell>
                   <TableCell>

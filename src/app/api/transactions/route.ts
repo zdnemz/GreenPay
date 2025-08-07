@@ -1,29 +1,14 @@
 import { db } from "@/lib/db";
 import { response } from "@/lib/response";
-import { TrashType, Status } from "@/generated/prisma/client";
+import { Status } from "@/generated/prisma/client";
 import { NextRequest } from "next/server";
-import { verifyToken } from "@/lib/jwt";
+import { getUserFromSession } from "@/lib/session";
 
 export async function GET(req: NextRequest) {
   try {
-    const token = req.cookies.get("auth_token")?.value;
-
-    // jika token tidak ada
-    if (!token) {
-      const res = response(401, "Tidak terautentikasi");
-      res.cookies.delete("auth_token");
-
-      return res;
-    }
-
-    const payload = verifyToken(token);
-
-    // jika tidak ada payload atau tidak terverifikasi
-    if (!payload) {
-      const res = response(401, "Tidak terautentikasi");
-      res.cookies.delete("auth_token");
-
-      return res;
+    const session = await getUserFromSession();
+    if (!session || session.role !== "USER") {
+      return response(401, "Hanya user yang dapat mengakses endpoint ini");
     }
 
     const { searchParams } = new URL(req.url);
@@ -34,34 +19,47 @@ export async function GET(req: NextRequest) {
 
     // Cast ke enum
     const statusParam = searchParams.get("status");
-    const trashTypeParam = searchParams.get("trashType");
 
     const status = statusParam ? (statusParam as Status) : undefined;
-    const trashType = trashTypeParam
-      ? (trashTypeParam as TrashType)
-      : undefined;
 
     const skip = (page - 1) * limit;
 
     const total = await db.transaction.count({
       where: {
-        userId: payload.id,
+        userId: session.id,
         ...(status && { status }),
-        ...(trashType && { trashType }),
       },
     });
 
     const transactions = await db.transaction.findMany({
       where: {
-        userId: payload.id,
+        userId: session.id,
         ...(status && { status }),
-        ...(trashType && { trashType }),
       },
       orderBy: {
         createdAt: sort === "asc" ? "asc" : "desc",
       },
       skip,
       take: limit,
+      select: {
+        id: true,
+        createdAt: true,
+        status: true,
+        signature: true,
+        petugas: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        items: {
+          select: {
+            trashType: true,
+            weight: true,
+            points: true,
+          },
+        },
+      },
     });
 
     return response(200, {

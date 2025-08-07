@@ -1,4 +1,6 @@
-export const MOCK_LEADERBOARD_DATA = {
+import { AdminAnalyticData, LeaderboardData } from "@/types";
+
+export const MOCK_LEADERBOARD_DATA: LeaderboardData = {
   users: [
     {
       id: "user-20",
@@ -147,7 +149,7 @@ export const MOCK_LEADERBOARD_DATA = {
   page: 1,
 };
 
-export const MOCK_ADMIN_DASHBOARD_DATA = {
+export const MOCK_ADMIN_DASHBOARD_DATA: AdminAnalyticData = {
   totalUser: 150,
   totalPetugas: 10,
   totalTransaksi: 65,

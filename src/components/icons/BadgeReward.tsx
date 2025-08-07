@@ -1,10 +1,10 @@
 import * as React from "react";
 
-type BadgeRewardIconProps = {
+interface BadgeRewardIconProps {
   width?: number | string;
   height?: number | string;
   className?: string;
-};
+}
 
 const BadgeRewardIcon: React.FC<BadgeRewardIconProps> = React.memo(
   ({ width = 24, height = 24, className = "" }) => {

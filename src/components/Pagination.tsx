@@ -10,11 +10,11 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-type PaginationComponentProps = {
+interface PaginationComponentProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
-};
+}
 
 export default function PaginationComponent({
   currentPage,

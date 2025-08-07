@@ -27,20 +27,28 @@ model User {
 }
 
 model Transaction {
-  id String @id @default(uuid())
-
-  // Relation to User
-  user   User   @relation("UserTransactions", fields: [userId], references: [id])
-  userId String
-
-  // Relation to Petugas
+  id        String  @id @default(uuid())
+  user      User    @relation("UserTransactions", fields: [userId], references: [id])
+  userId    String
   petugas   User?   @relation("PetugasTransactions", fields: [petugasId], references: [id])
   petugasId String?
 
+  status    Status
+  createdAt DateTime @default(now())
+
+  signature String
+
+  items TransactionItem[]
+}
+
+model TransactionItem {
+  id            String      @id @default(uuid())
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  transactionId String
+
   trashType TrashType
+  weight    Float
   points    Int
-  status    Status    @default(PENDING)
-  createdAt DateTime  @default(now())
 }
 
 enum Role {
@@ -58,7 +66,6 @@ enum TrashType {
 }
 
 enum Status {
-  PENDING
   APPROVED
   REJECTED
 }

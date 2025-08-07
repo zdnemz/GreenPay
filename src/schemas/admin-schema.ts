@@ -1,4 +1,4 @@
-import { Role } from "@/lib/enum";
+import { Role } from "@/generated/prisma";
 import z from "zod";
 
 export const UserUpdateSchema = z.object({

@@ -1,12 +1,12 @@
 import * as React from "react";
 
-type GreenPayIconProps = {
+interface GreenPayIconProps {
   width?: number | string;
   height?: number | string;
   color?: string;
   strokeWidth?: number;
   className?: string;
-};
+}
 
 const GreenPayIcon: React.FC<GreenPayIconProps> = React.memo(
   ({

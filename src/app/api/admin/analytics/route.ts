@@ -2,84 +2,90 @@ import { db } from "@/lib/db";
 import { getUserFromSession } from "@/lib/session";
 import { response } from "@/lib/response";
 import { Role, Status } from "@/generated/prisma/client";
-import { POINTS_CONFIG } from "@/lib/points";
 
 export async function GET() {
   try {
     const user = await getUserFromSession();
-
     if (!user || user.role !== Role.ADMIN) {
       return response(401, "Tidak memiliki akses");
     }
 
-    const totalUser = await db.user.count({
-      where: { role: Role.USER },
-    });
+    // Parallel Queries
+    const [
+      totalUser,
+      totalPetugas,
+      totalTransaksi,
+      transaksiStatusGroup,
+      totalSampah,
+      pointPerTrashType,
+      transaksiPerBulan,
+    ] = await Promise.all([
+      db.user.count({ where: { role: Role.USER } }),
+      db.user.count({ where: { role: Role.PETUGAS } }),
+      db.transaction.count(),
+      db.transaction.groupBy({
+        by: ["status"],
+        _count: { _all: true },
+      }),
+      db.transactionItem.aggregate({
+        _sum: { weight: true, points: true },
+        where: {
+          transaction: { status: Status.APPROVED },
+        },
+      }),
+      db.transactionItem.groupBy({
+        by: ["trashType"],
+        where: {
+          transaction: { status: Status.APPROVED },
+        },
+        _sum: { points: true },
+      }),
+      db.$queryRaw<{ bulan: number; tahun: number; jumlah: number }[]>`
+        SELECT 
+          EXTRACT(MONTH FROM t."createdAt") AS bulan,
+          EXTRACT(YEAR FROM t."createdAt") AS tahun,
+          COUNT(*) AS jumlah
+        FROM "Transaction" t
+        GROUP BY bulan, tahun
+        ORDER BY tahun ASC, bulan ASC;
+      `,
+    ]);
 
-    const totalPetugas = await db.user.count({
-      where: { role: Role.PETUGAS },
-    });
-
-    const totalTransaksi = await db.transaction.count();
-
-    const transaksiGrup = await db.transaction.groupBy({
-      by: ["status"],
-      _count: { _all: true },
-    });
-
-    const { pending, approved, rejected } = {
-      pending:
-        transaksiGrup.find((g) => g.status === Status.PENDING)?._count._all ??
-        0,
-      approved:
-        transaksiGrup.find((g) => g.status === Status.APPROVED)?._count._all ??
-        0,
-      rejected:
-        transaksiGrup.find((g) => g.status === Status.REJECTED)?._count._all ??
-        0,
+    // Format Data Status Transaksi
+    const transaksiStatus = {
+      approved: 0,
+      rejected: 0,
     };
 
-    const totalPoint = await db.transaction.groupBy({
-      by: ["trashType"],
-      where: { status: Status.APPROVED },
-      _sum: { points: true },
-    });
+    for (const group of transaksiStatusGroup) {
+      if (group.status === Status.APPROVED) {
+        transaksiStatus.approved = group._count._all;
+      } else if (group.status === Status.REJECTED) {
+        transaksiStatus.rejected = group._count._all;
+      }
+    }
 
-    const totalSampah = totalPoint.map((item) => {
-      const jenis = item.trashType;
-      const totalPoints = item._sum.points || 0;
-      const pointsPerKg = POINTS_CONFIG.POINTS_PER_KG[jenis];
-      const totalKg = totalPoints / pointsPerKg;
+    // Format Point per TrashType
+    const poinPerJenisSampah = pointPerTrashType.map((item) => ({
+      trashType: item.trashType,
+      totalPoin: item._sum.points ?? 0,
+    }));
 
-      return {
-        type: jenis,
-        total: parseFloat(totalKg.toFixed(2)),
-      };
-    });
+    // Format Total Sampah
+    const totalSampahResult = {
+      totalBerat: totalSampah._sum.weight ?? 0,
+      totalPoin: totalSampah._sum.points ?? 0,
+    };
 
-    const transaksiPerBulan = await db.$queryRaw<
-      { bulan: number; tahun: number; jumlah: number }[]
-    >`
-      SELECT 
-        EXTRACT(MONTH FROM "createdAt") AS bulan,
-        EXTRACT(YEAR FROM "createdAt") AS tahun,
-        COUNT(*) AS jumlah
-      FROM "Transaction"
-      GROUP BY bulan, tahun
-      ORDER BY tahun ASC, bulan ASC;
-    `;
-
+    // Final Response
     return response(200, {
       totalUser,
       totalPetugas,
       totalTransaksi,
+      transaksiStatus,
       transaksiPerBulan,
-      totalSampah,
-      transaksiStatus: {
-        pending,
-        approved,
-        rejected,
-      },
+      poinPerJenisSampah,
+      totalSampah: totalSampahResult,
     });
   } catch (err) {
     console.error("Error GET /admin/analytics:", err);
