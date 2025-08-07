@@ -12,46 +12,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useLoading } from "@/hooks/useLoading";
-import { ApiResponse } from "@/lib/response";
+import { useFetch } from "@/hooks/useFetch";
 import { TransactionData } from "@/types";
-import axios, { AxiosError } from "axios";
 import * as React from "react";
-import { toast } from "sonner";
 
 export default function Transactions() {
-  const [transactions, setTransactions] = React.useState<TransactionData>();
-  const { startLoading, stopLoading } = useLoading("user-transaction");
-
-  React.useEffect(() => {
-    let canceled = true;
-
-    async function fetchData() {
-      if (!canceled) return;
-
-      startLoading();
-      try {
-        const { data } = await axios.get<ApiResponse>(
-          "/api/users/transactions",
-        );
-
-        setTransactions(data.data as TransactionData);
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          console.error("Transaction error:", error);
-          toast.error((error.response?.data as ApiResponse).error as string);
-        }
-      } finally {
-        stopLoading();
-      }
-    }
-
-    fetchData();
-
-    return () => {
-      canceled = false;
-    };
-  }, [startLoading, stopLoading]);
+  const { data: transactions } = useFetch<TransactionData>({
+    url: "/api/users/transactions",
+    fetcherParams: {
+      method: "get",
+      config: { withCredentials: true },
+    },
+    immediate: true,
+  });
 
   return (
     <RootLayout header={<Navbar />} footer={<Footer />}>

@@ -6,94 +6,38 @@ import { useAuthUser } from "@/stores/auth-store";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { AdminAnalyticData } from "@/types";
-import { ApiResponse } from "@/lib/response";
-import axios, { AxiosError } from "axios";
-import { toast } from "sonner";
 import TransactionGraphics from "@/components/pages/admin/dashboard/transactionChart";
 import TransactionStatusChart from "@/components/pages/admin/dashboard/transactionStatusChart";
-import { APP_ENV } from "@/lib/config";
 import TrashTypeTotalChart from "@/components/pages/admin/dashboard/trashTypeTotalChart";
 import Statistic from "@/components/pages/admin/dashboard/statictic";
-import { useLoading } from "@/hooks/useLoading";
-
-// mock data for development
-const MOCK_DATA: AdminAnalyticData | null =
-  APP_ENV === "development"
-    ? {
-        totalUser: 150,
-        totalPetugas: 10,
-        totalTransaksi: 65,
-        totalSampah: [
-          { type: "Plastik", total: 120 },
-          { type: "Kertas", total: 90 },
-          { type: "Logam", total: 30 },
-          { type: "Kaca", total: 50 },
-        ],
-        transaksiPerBulan: [
-          { bulan: 8, tahun: 2024, jumlah: 120 },
-          { bulan: 9, tahun: 2024, jumlah: 140 },
-          { bulan: 10, tahun: 2024, jumlah: 135 },
-          { bulan: 11, tahun: 2024, jumlah: 160 },
-          { bulan: 12, tahun: 2024, jumlah: 180 },
-          { bulan: 1, tahun: 2025, jumlah: 200 },
-          { bulan: 2, tahun: 2025, jumlah: 190 },
-          { bulan: 3, tahun: 2025, jumlah: 220 },
-          { bulan: 4, tahun: 2025, jumlah: 250 },
-          { bulan: 5, tahun: 2025, jumlah: 270 },
-          { bulan: 6, tahun: 2025, jumlah: 260 },
-          { bulan: 7, tahun: 2025, jumlah: 300 },
-          { bulan: 8, tahun: 2025, jumlah: 290 },
-          { bulan: 9, tahun: 2025, jumlah: 420 },
-          { bulan: 10, tahun: 2025, jumlah: 320 },
-          { bulan: 11, tahun: 2025, jumlah: 390 },
-        ],
-        transaksiStatus: {
-          pending: 15,
-          approved: 42,
-          rejected: 8,
-        },
-      }
-    : null;
+import { useFetch } from "@/hooks/useFetch";
+import { IS_DEV } from "@/lib/config";
+import { toast } from "sonner";
+import { MOCK_ADMIN_DASHBOARD_DATA } from "@/lib/mock";
 
 export default function Dashboard() {
   const user = useAuthUser();
 
-  const [analytics, setanalytics] = React.useState<AdminAnalyticData>();
-  const { startLoading, stopLoading } = useLoading("admin-dashboard");
+  const { data } = useFetch<AdminAnalyticData>({
+    url: "/api/admin/analytics",
+    fetcherParams: {
+      method: "get",
+      config: { withCredentials: true },
+    },
+    immediate: !IS_DEV,
+  });
+
+  // dev info
+  const didToast = React.useRef(false);
 
   React.useEffect(() => {
-    let canceled = true;
-
-    async function fetchData() {
-      try {
-        if (!canceled) return;
-
-        startLoading();
-
-        if (APP_ENV == "development") {
-          setanalytics(MOCK_DATA as AdminAnalyticData);
-          return;
-        }
-
-        const { data } = await axios.get<ApiResponse>("/api/admin/analytics");
-
-        setanalytics(data.data as AdminAnalyticData);
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          console.error("Admin dashboard error:", error);
-          toast.error((error.response?.data as ApiResponse).error as string);
-        }
-      } finally {
-        stopLoading();
-      }
+    if (IS_DEV && !didToast.current) {
+      toast.info("This data is MOCK for development");
+      didToast.current = true;
     }
+  }, []);
 
-    fetchData();
-
-    return () => {
-      canceled = false;
-    };
-  }, [startLoading, stopLoading]);
+  const analytics = !IS_DEV ? data : MOCK_ADMIN_DASHBOARD_DATA;
 
   return (
     <RootLayout header={<Navbar />} footer={<Footer />}>

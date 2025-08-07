@@ -4,7 +4,6 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import axios, { AxiosError } from "axios";
 import { z } from "zod";
 
 import {
@@ -25,11 +24,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { changePasswordSchema } from "@/schemas/auth-schema";
+import { useAuthActions } from "@/stores/auth-store";
+import { useRouter } from "next/navigation";
+import { fetcher } from "@/lib/fetcher";
 
 type ChangePasswordValues = z.infer<typeof changePasswordSchema>;
 
 export default function ChangePasswordDialog() {
   const [isPending, startTransition] = React.useTransition();
+  const { clearUser } = useAuthActions();
+
+  const router = useRouter();
 
   const form = useForm<ChangePasswordValues>({
     resolver: zodResolver(changePasswordSchema),
@@ -43,21 +48,29 @@ export default function ChangePasswordDialog() {
   async function onSubmit(values: ChangePasswordValues) {
     startTransition(async () => {
       try {
-        await axios.post("/api/auth/change-password", values, {
-          withCredentials: true,
+        await fetcher({
+          url: "/api/auth/change-password",
+          method: "post",
+          data: values,
+          config: {
+            withCredentials: true,
+          },
         });
 
-        toast.success("Password berhasil diubah");
+        toast.success("Password berhasil diubah, Silahkan login ulang");
         form.reset();
+
+        // logout
+        await fetcher({
+          url: "/api/auth/logout",
+          method: "delete",
+          config: { withCredentials: true },
+        });
+        await clearUser();
+        router.push("/login");
       } catch (error) {
-        if (error instanceof AxiosError) {
-          toast.error(
-            (error.response?.data?.error as string) ||
-              "Gagal mengganti password",
-          );
-        } else {
-          toast.error("Terjadi kesalahan");
-        }
+        console.error("change password error:", error);
+        toast.error((error as Error).message || "Terjadi kesalahan");
       }
     });
   }

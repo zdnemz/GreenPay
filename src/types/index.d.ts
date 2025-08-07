@@ -1,4 +1,17 @@
-import type { Decimal } from "@prisma/client/runtime/library";
+export type Pagination = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+};
+
+export type ApiResponse<T = unknown> = {
+  success: boolean;
+  message: string;
+  data?: T | null;
+  pagination?: Pagination;
+  error?: unknown;
+};
 
 export interface User {
   id: string;
@@ -8,14 +21,14 @@ export interface User {
 }
 
 export interface UserData {
-  id: string;
   name: string;
+  id: string;
   email: string;
-  balance: Decimal;
+  points: number;
+  currentRank: number | null;
+  lastRank: number | null;
   role: User["role"];
   createdAt: Date;
-  points: number;
-  rank: number;
 }
 
 export interface LeaderboardData {
@@ -65,4 +78,11 @@ export interface AdminAnalyticData {
     approved: number;
     rejected: number;
   };
+}
+
+export interface AdminUserData {
+  id: string;
+  email: string;
+  name: string;
+  createdAt: Date;
 }

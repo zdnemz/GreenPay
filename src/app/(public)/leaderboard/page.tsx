@@ -8,79 +8,35 @@ import RootLayout from "@/components/layouts/RootLayout";
 import Navbar from "@/components/Navbar";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
-import { useLoading } from "@/hooks/useLoading";
-import { APP_ENV } from "@/lib/config";
-import { ApiResponse } from "@/lib/response";
+import { useFetch } from "@/hooks/useFetch";
+import { IS_DEV } from "@/lib/config";
+import { MOCK_LEADERBOARD_DATA } from "@/lib/mock";
 import { LeaderboardData } from "@/types";
-import axios, { AxiosError } from "axios";
 import Image from "next/image";
 import * as React from "react";
 import { toast } from "sonner";
 
-const MOCK_DATA =
-  APP_ENV === "development"
-    ? (() => {
-        const users = Array.from({ length: 20 }, (_, i) => ({
-          id: `user-${i + 1}`,
-          name: `Pengguna ${i + 1}`,
-          role: "USER" as const,
-          points: Math.floor(Math.random() * 1000),
-          rank: 0,
-        }));
-
-        users.sort((a, b) => b.points - a.points);
-
-        users.forEach((user, index) => {
-          user.rank = index + 1;
-        });
-
-        const currentUser = users.find((u) => u.id === "user-14");
-
-        return {
-          users,
-          myRank: currentUser?.rank ?? -1,
-          myPoints: currentUser?.points ?? 0,
-          role: "USER",
-          page: 1,
-        };
-      })()
-    : null;
-
 export default function Leaderboard() {
-  const [leaderboard, setLeaderboard] = React.useState<LeaderboardData>();
-  const { startLoading, stopLoading } = useLoading("leaderboard");
+  const { data } = useFetch<LeaderboardData>({
+    url: "/api/leaderboard",
+    fetcherParams: {
+      method: "get",
+      config: { withCredentials: true },
+    },
+    immediate: !IS_DEV,
+  });
+
+  // dev info
+  const didToast = React.useRef(false);
 
   React.useEffect(() => {
-    let canceled = true;
-
-    async function fetchData() {
-      if (!canceled) return;
-      try {
-        startLoading();
-        if (APP_ENV == "development") {
-          setLeaderboard(MOCK_DATA as LeaderboardData);
-          return;
-        }
-
-        const { data } = await axios.get<ApiResponse>("/api/leaderboard");
-
-        setLeaderboard(data.data as LeaderboardData);
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          console.error("Leaderboard error:", error);
-          toast.error((error.response?.data as ApiResponse).error as string);
-        }
-      } finally {
-        stopLoading();
-      }
+    if (IS_DEV && !didToast.current) {
+      toast.info("This data is MOCK for development");
+      didToast.current = true;
     }
+  }, []);
 
-    fetchData();
-
-    return () => {
-      canceled = false;
-    };
-  }, [startLoading, stopLoading]);
+  const leaderboard = !IS_DEV ? data : MOCK_LEADERBOARD_DATA;
 
   return (
     <RootLayout header={<Navbar />} footer={<Footer />}>

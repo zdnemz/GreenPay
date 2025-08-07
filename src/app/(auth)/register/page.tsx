@@ -5,7 +5,6 @@ import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import axios, { AxiosError } from "axios";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,19 +25,16 @@ import {
 } from "@/components/ui/form";
 import { registerSchema } from "@/schemas/auth-schema";
 import { toast } from "sonner";
-import { ApiResponse } from "@/lib/response";
 import Link from "next/link";
-import { useAuthActions } from "@/stores/auth-store";
 import { useRouter } from "next/navigation";
+import { useAuthActions } from "@/stores/auth-store";
 import { User } from "@/types";
-import { useLoading } from "@/hooks/useLoading";
+import { fetcher } from "@/lib/fetcher";
 
 export default function Register() {
   const [isPending, startTransition] = React.useTransition();
-  const { setUser } = useAuthActions();
-  const { startLoading, stopLoading } = useLoading("auth-register");
-
   const router = useRouter();
+  const { setUser } = useAuthActions();
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -48,34 +44,21 @@ export default function Register() {
   async function onSubmit(values: z.infer<typeof registerSchema>) {
     startTransition(async () => {
       try {
-        startLoading();
+        const { data } = await fetcher<User>({
+          url: "/api/auth/register",
+          method: "post",
+          data: values,
+          config: { withCredentials: true },
+        });
 
-        const { data } = await axios.post<ApiResponse>(
-          "/api/auth/register",
-          {
-            ...values,
-          },
-          {
-            withCredentials: true,
-          },
-        );
+        if (!data) throw new Error();
 
-        if (!data.success) {
-          toast.error((data.error as string) || "Terjadi Kesalahan");
-          return;
-        }
-
-        await setUser(data.data as User);
-
-        toast.success("register sukses! Mengarahkan...");
-        router.push("/dashboard");
+        await setUser(data);
+        toast.success("Pendaftaran sukses! Mengarahkan...");
+        router.replace("/dashboard");
       } catch (error) {
-        if (error instanceof AxiosError) {
-          console.error("register error:", error);
-          toast.error((error.response?.data as ApiResponse).error as string);
-        }
-      } finally {
-        stopLoading();
+        console.error("register error:", error);
+        toast.error((error as Error).message || "Terjadi kesalahan");
       }
     });
   }

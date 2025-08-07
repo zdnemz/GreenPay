@@ -8,7 +8,6 @@ import z from "zod";
 import { toast } from "sonner";
 
 import { updateUserSchema } from "@/schemas/user-schema";
-import { ApiResponse } from "@/lib/response";
 
 import { Edit2 } from "lucide-react";
 
@@ -30,9 +29,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import axios, { AxiosError } from "axios";
 import { UserData } from "@/types";
-import { useLoading } from "@/hooks/useLoading";
+import { fetcher } from "@/lib/fetcher";
 
 interface EditProfileDialogProps {
   user: UserData;
@@ -43,9 +41,8 @@ export default function EditProfileDialog({
   user,
   onSuccess,
 }: EditProfileDialogProps) {
-  const { startLoading, stopLoading } = useLoading("user-profile-edit");
-
   const [isPending, startTransition] = React.useTransition();
+  const [open, setOpen] = React.useState(false);
 
   const form = useForm<z.infer<typeof updateUserSchema>>({
     resolver: zodResolver(updateUserSchema),
@@ -63,40 +60,27 @@ export default function EditProfileDialog({
 
     startTransition(async () => {
       try {
-        startLoading();
-        const { data } = await axios.put<ApiResponse>(
-          "/api/users/profile",
-          {
-            ...cleanedValues,
-          },
-          {
+        await fetcher({
+          url: "/api/users/profile",
+          method: "put",
+          data: cleanedValues,
+          config: {
             withCredentials: true,
           },
-        );
-
-        if (!data.success) {
-          toast.error((data.error as string) || "Terjadi Kesalahan");
-          return;
-        }
-        onSuccess();
+        });
 
         toast.success("Profile telah diperbarui");
+        onSuccess();
+        setOpen(false);
       } catch (error) {
-        if (error instanceof AxiosError) {
-          console.error("Update profile error:", error);
-          toast.error((error.response?.data as ApiResponse).error as string);
-          return;
-        }
-
-        toast.error("Terjadi kesalahan");
-      } finally {
-        stopLoading();
+        console.error("profile edit error:", error);
+        toast.error((error as Error).message || "Terjadi kesalahan");
       }
     });
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="cursor-pointer bg-[linear-gradient(270deg,var(--chart-1),var(--chart-2),var(--chart-3),var(--chart-4))] bg-[length:200%_200%] shadow transition-all duration-300 hover:shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]">
           Edit Profil

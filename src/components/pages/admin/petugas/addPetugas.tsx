@@ -13,9 +13,7 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { registerSchema } from "@/schemas/auth-schema"; // pastikan ini adalah schema dengan name, email, password
-import { ApiResponse } from "@/lib/response";
-import axios, { AxiosError } from "axios";
+import { registerSchema } from "@/schemas/auth-schema";
 import {
   Form,
   FormControl,
@@ -24,6 +22,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { fetcher } from "@/lib/fetcher";
 
 interface AddPetugasDialogProps {
   onSuccess: () => void;
@@ -42,20 +41,22 @@ export function AddPetugasDialog({ onSuccess }: AddPetugasDialogProps) {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof registerSchema>) => {
+  const onSubmit = (values: z.infer<typeof registerSchema>) => {
     startTransition(async () => {
       try {
-        await axios.post<ApiResponse>("/api/admin/petugas", data, {
-          withCredentials: true,
+        await fetcher({
+          url: "/api/admin/petugas",
+          method: "post",
+          data: values,
+          config: { withCredentials: true },
         });
 
         toast.success("Petugas baru berhasil ditambahkan");
-        if (onSuccess) onSuccess();
+        onSuccess();
         setOpen(false);
       } catch (error) {
-        if (error instanceof AxiosError) {
-          toast.error((error.response?.data as ApiResponse).error as string);
-        }
+        console.error("add Petugas error:", error);
+        toast.error((error as Error).message || "Terjadi kesalahan");
       }
     });
   };
@@ -63,10 +64,7 @@ export function AddPetugasDialog({ onSuccess }: AddPetugasDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          size="lg"
-          className="relative cursor-pointer bg-[linear-gradient(270deg,var(--chart-1),var(--chart-2),var(--chart-3),var(--chart-4))] bg-[length:200%_200%] shadow transition-all duration-300 hover:shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]"
-        >
+        <Button className="relative cursor-pointer bg-[linear-gradient(270deg,var(--chart-1),var(--chart-2),var(--chart-3),var(--chart-4))] bg-[length:200%_200%] shadow transition-all duration-300 hover:shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]">
           Tambah Petugas
         </Button>
       </DialogTrigger>
@@ -100,7 +98,11 @@ export function AddPetugasDialog({ onSuccess }: AddPetugasDialogProps) {
                 <FormItem>
                   <FormLabel>Nama</FormLabel>
                   <FormControl>
-                    <Input placeholder="Nama Lengkap" {...field} />
+                    <Input
+                      autoComplete="off"
+                      placeholder="Nama Lengkap"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

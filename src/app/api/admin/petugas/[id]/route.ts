@@ -81,56 +81,31 @@ export async function PUT(
 }
 
 export async function DELETE(
-  _: NextRequest,
+  _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const sessionUser = await getUserFromSession();
 
   if (!sessionUser || sessionUser.role !== "ADMIN") {
-    return response(401, "Tidak diizinkan");
+    return response(401, "Unauthorized");
   }
 
   try {
     const { id } = await params;
 
-    // Cek apakah user yang akan dihapus adalah petugas
-    const existingUser = await db.user.findFirst({
-      where: { id, role: "PETUGAS" },
-      select: { id: true, name: true, role: true },
-    });
+    const user = await db.user.findUnique({ where: { id } });
 
-    if (!existingUser) {
-      return response(404, "Petugas tidak ditemukan");
+    if (!user) {
+      return response(404, "Petugas tidak di temukan");
     }
 
-    const deletableRoles = await db.user.findMany({
-      select: { role: true },
-      distinct: ["role"],
-      where: {
-        role: {
-          not: "ADMIN",
-        },
-      },
-    });
-
-    const allowedDeletableRoles = deletableRoles.map((u) => u.role);
-
-    if (!allowedDeletableRoles.includes(existingUser.role)) {
-      return response(
-        403,
-        `Hanya user dengan role: ${allowedDeletableRoles.join(", ")} yang bisa dihapus`,
-      );
+    if (user.role !== "PETUGAS") {
+      return response(403, "Hanya user dengan role: PETUGAS yang bisa dihapus");
     }
 
-    // Hapus user
-    const deleted = await db.user.delete({
-      where: { id },
-    });
+    await db.user.delete({ where: { id } });
 
-    return response(200, {
-      id: deleted.id,
-      message: `Petugas ${existingUser.name} berhasil dihapus`,
-    });
+    return response(200, "Petugas berhasil dihapus");
   } catch (error) {
     console.error("Error deleting petugas:", error);
 

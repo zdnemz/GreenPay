@@ -1,11 +1,5 @@
+import { ApiResponse } from "@/types";
 import { NextResponse } from "next/server";
-
-export type ApiResponse<T = unknown> = {
-  success: boolean;
-  message: string;
-  data?: T | null;
-  error?: unknown;
-};
 
 const defaultMessages: Record<number, string> = {
   200: "OK",
@@ -17,9 +11,12 @@ const defaultMessages: Record<number, string> = {
   500: "Internal Server Error",
 };
 
-export function response<T>(status: number, data?: T | null) {
+export function response<T>(
+  status: number,
+  data?: T | null,
+  pagination?: ApiResponse["pagination"],
+) {
   const success = status >= 200 && status < 300;
-
   const message = defaultMessages[status] || (success ? "Success" : "Error");
   let error: unknown = null;
 
@@ -38,6 +35,7 @@ export function response<T>(status: number, data?: T | null) {
     message,
     data: success ? data : null,
     error,
+    pagination: success ? pagination : undefined,
   };
 
   return NextResponse.json(body, { status });

@@ -17,9 +17,7 @@ import {
   useAuthUser,
   useIsAuthenticated,
 } from "@/stores/auth-store";
-import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
-import { ApiResponse } from "@/lib/response";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
@@ -32,6 +30,7 @@ import {
   DialogClose,
 } from "./ui/dialog";
 import { lockScroll, unlockScroll } from "@/lib/scroll";
+import { fetcher } from "@/lib/fetcher";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -44,24 +43,17 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     try {
-      const { data }: { data: ApiResponse } =
-        await axios.delete("/api/auth/logout");
+      await fetcher({
+        url: "/api/auth/logout",
+        method: "delete",
+        config: { withCredentials: true },
+      });
 
-      if (!data.success) {
-        toast.error((data.error as string) || "Terjadi kesalahan");
-      }
-
-      setTimeout(() => {
-        clearUser();
-        // router.push("/");
-      }, 200);
-
+      await clearUser();
       router.push("/");
     } catch (error) {
-      if (error instanceof AxiosError) {
-        console.error("register error:", error);
-        toast.error((error.response?.data as ApiResponse).error as string);
-      }
+      console.error("Logout error:", error);
+      toast.error((error as Error).message);
     }
   };
 

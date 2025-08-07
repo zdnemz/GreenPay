@@ -15,6 +15,8 @@ export async function PUT(req: NextRequest) {
 
     const data = await req.json();
 
+    console.log(data);
+
     const validated = await validate(updateUserSchema, data);
     if (!validated.success) {
       return response(400, validated.error);

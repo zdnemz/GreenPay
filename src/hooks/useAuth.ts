@@ -1,11 +1,10 @@
 "use client";
 
 import * as React from "react";
-import axios, { AxiosError } from "axios";
 import { useAuthActions } from "@/stores/auth-store";
-import { ApiResponse } from "@/lib/response";
 import { User } from "@/types";
 import { useLoading } from "@/hooks/useLoading";
+import { fetcher } from "@/lib/fetcher";
 
 export const useAuthCheck = () => {
   const { setUser, clearUser, setInitialized } = useAuthActions();
@@ -19,21 +18,17 @@ export const useAuthCheck = () => {
       startLoading();
 
       try {
-        const { data } = await axios.get<ApiResponse>("/api/auth/check");
+        const { data } = await fetcher<User>({
+          url: "/api/auth/check",
+          method: "get",
+          config: { withCredentials: true },
+        });
 
-        if (!data.success) {
-          await clearUser();
-          return;
-        }
+        if (!data) throw new Error();
 
-        await setUser(data.data as User);
+        await setUser(data);
       } catch (error) {
-        if (error instanceof AxiosError && error.response?.status !== 401) {
-          console.error(
-            "Auth check failed:",
-            (error.response?.data as ApiResponse).error,
-          );
-        }
+        console.error("Auth check failed:", error);
         await clearUser();
       } finally {
         stopLoading();

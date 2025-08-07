@@ -12,47 +12,36 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ApiResponse } from "@/lib/response";
 import { User } from "@/types";
-import axios, { AxiosError } from "axios";
-import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { EditPetugasDialog } from "@/components/pages/admin/petugas/editPetugas";
-import { DeleteUserDialog } from "@/components/pages/admin/users/deleteUser";
+import { DeletePetugasDialog } from "@/components/pages/admin/petugas/deletePetugas";
 import { AddPetugasDialog } from "@/components/pages/admin/petugas/addPetugas";
-import { useLoading } from "@/hooks/useLoading";
+import Pagination from "@/components/Pagination";
+import { Input } from "@/components/ui/input";
+import { useSearch } from "@/hooks/useSearch";
 
 export default function Petugas() {
-  const [petugas, setPetugas] =
-    React.useState<(User & { createdAt: Date })[]>();
-  const { startLoading, stopLoading } = useLoading("admin-petugas");
-  const [refreshKey, setRefreshKey] = React.useState(0);
+  const {
+    data: petugas,
+    pagination,
+    searchInput,
+    handleSearchInputChange,
+    handlePageChange,
+    refreshData,
+  } = useSearch<(User & { createdAt: Date })[]>({
+    apiEndpoint: "/api/admin/petugas",
+    loadingKey: "admin-petugas",
+    debounceMs: 500,
+  });
 
-  React.useEffect(() => {
-    let canceled = true;
+  const handlePetugasUpdate = React.useCallback(() => {
+    refreshData();
+  }, [refreshData]);
 
-    async function fetchData() {
-      try {
-        if (!canceled) return;
-
-        startLoading();
-        const { data } = await axios.get<ApiResponse>("/api/admin/petugas");
-        setPetugas(data.data as (User & { createdAt: Date })[]);
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          console.error("Admin dashboard error:", error);
-          toast.error((error.response?.data as ApiResponse).error as string);
-        }
-      } finally {
-        stopLoading();
-      }
-    }
-
-    fetchData();
-    return () => {
-      canceled = false;
-    };
-  }, [refreshKey, startLoading, stopLoading]);
+  const handlePetugasDelete = React.useCallback(() => {
+    refreshData();
+  }, [refreshData]);
 
   return (
     <RootLayout header={<Navbar />} footer={<Footer />}>
@@ -66,8 +55,20 @@ export default function Petugas() {
         </div>
 
         <Card className="gap-3 p-6 shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]">
-          <div className="flex justify-end">
-            <AddPetugasDialog onSuccess={() => setRefreshKey((k) => k + 1)} />
+          <div className="grid w-full gap-3 md:flex md:justify-between">
+            {/* Search Input */}
+            <form
+              className="flex w-full items-center gap-2"
+              onSubmit={(e) => e.preventDefault()}
+            >
+              <Input
+                placeholder="Cari nama atau email..."
+                value={searchInput}
+                onChange={handleSearchInputChange}
+                className="w-full max-w-md"
+              />
+            </form>
+            <AddPetugasDialog onSuccess={handlePetugasUpdate} />
           </div>
           <Table>
             <TableHeader>
@@ -82,7 +83,11 @@ export default function Petugas() {
             <TableBody>
               {petugas?.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell>{user.id}</TableCell>
+                  <TableCell>
+                    <span className="block max-w-20 truncate overflow-hidden text-ellipsis whitespace-nowrap">
+                      {user.id}
+                    </span>
+                  </TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.name}</TableCell>
                   <TableCell>
@@ -94,11 +99,11 @@ export default function Petugas() {
                   <TableCell className="space-x-2">
                     <EditPetugasDialog
                       petugas={user}
-                      onSuccess={() => setRefreshKey((k) => k + 1)}
+                      onSuccess={handlePetugasUpdate}
                     />
-                    <DeleteUserDialog
-                      user={user}
-                      onSuccess={() => setRefreshKey((k) => k + 1)}
+                    <DeletePetugasDialog
+                      petugas={user}
+                      onSuccess={handlePetugasDelete}
                     />
                   </TableCell>
                 </TableRow>
@@ -106,6 +111,14 @@ export default function Petugas() {
             </TableBody>
           </Table>
         </Card>
+
+        <div className="flex items-center justify-center">
+          <Pagination
+            currentPage={pagination?.page || 1}
+            totalPages={pagination?.totalPages || 1}
+            onPageChange={handlePageChange}
+          />
+        </div>
       </section>
     </RootLayout>
   );

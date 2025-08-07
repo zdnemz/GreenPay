@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
         name: name.trim(),
         email: email.toLowerCase(),
         password: hashedPassword,
+        points: 0,
       },
       select: {
         id: true,

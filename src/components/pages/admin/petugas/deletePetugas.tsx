@@ -9,10 +9,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
-import { ApiResponse } from "@/lib/response";
 import { User } from "@/types";
+import { fetcher } from "@/lib/fetcher";
 
 interface DeletePetugasDialogProps {
   petugas: User;
@@ -29,17 +28,17 @@ export function DeletePetugasDialog({
   const handleDelete = async () => {
     startTransition(async () => {
       try {
-        await axios.delete<ApiResponse>(`/api/admin/petugas/${petugas.id}`, {
-          withCredentials: true,
+        await fetcher({
+          url: `/api/admin/petugas/${petugas.id}`,
+          method: "delete",
+          config: { withCredentials: true },
         });
 
         toast.success(`Petugas "${petugas.name}" berhasil dihapus`);
-        if (onSuccess) onSuccess();
+        onSuccess();
       } catch (error) {
-        if (error instanceof AxiosError) {
-          console.error("Delete petugas error:", error);
-          toast.error((error.response?.data as ApiResponse).error as string);
-        }
+        console.error("Delete petugas error:", error);
+        toast.error((error as Error).message || "Terjadi kesalahan");
       } finally {
         setOpen(false);
       }

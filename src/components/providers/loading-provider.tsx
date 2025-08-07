@@ -1,6 +1,10 @@
 "use client";
 
-import { useLoadingStore } from "@/stores/loading-store";
+import {
+  useHasHydrated,
+  useIsLoading,
+  useLoadingActions,
+} from "@/stores/loading-store";
 import Loading from "../Loading";
 import { useEffect } from "react";
 import { lockScroll, unlockScroll } from "@/lib/scroll";
@@ -10,9 +14,9 @@ interface LoadingProviderProps {
 }
 
 export default function LoadingProvider({ children }: LoadingProviderProps) {
-  const isLoading = useLoadingStore((state) => state.loadingKeys.size > 0);
-  const hasHydrated = useLoadingStore((state) => state.hasHydrated);
-  const setHasHydrated = useLoadingStore((state) => state.setHasHydrated);
+  const isLoading = useIsLoading();
+  const hasHydrated = useHasHydrated();
+  const { setHasHydrated } = useLoadingActions();
 
   useEffect(() => {
     setHasHydrated();

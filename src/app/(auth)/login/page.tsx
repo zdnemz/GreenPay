@@ -5,7 +5,6 @@ import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import axios, { AxiosError } from "axios";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,18 +25,13 @@ import {
 } from "@/components/ui/form";
 import { loginSchema } from "@/schemas/auth-schema";
 import { toast } from "sonner";
-import { ApiResponse } from "@/lib/response";
 import Link from "next/link";
-import { useAuthActions } from "@/stores/auth-store";
-import { useRouter } from "next/navigation";
 import { User } from "@/types";
-import { useLoading } from "@/hooks/useLoading";
+import { useRouter } from "next/navigation";
+import { fetcher } from "@/lib/fetcher";
 
 export default function Login() {
   const [isPending, startTransition] = React.useTransition();
-  const { setUser } = useAuthActions();
-  const { startLoading, stopLoading } = useLoading("auth-login");
-
   const router = useRouter();
 
   const form = useForm<z.infer<typeof loginSchema>>({
@@ -48,38 +42,24 @@ export default function Login() {
   async function onSubmit(values: z.infer<typeof loginSchema>) {
     startTransition(async () => {
       try {
-        startLoading();
+        const { data } = await fetcher<User>({
+          url: "/api/auth/login",
+          method: "post",
+          data: values,
+          config: { withCredentials: true },
+        });
 
-        const { data } = await axios.post<ApiResponse>(
-          "/api/auth/login",
-          {
-            ...values,
-          },
-          {
-            withCredentials: true,
-          },
-        );
-
-        if (!data.success) {
-          toast.error((data.error as string) || "Terjadi Kesalahan");
-          return;
-        }
-
-        await setUser(data.data as User);
+        if (!data) throw new Error();
 
         toast.success("Login sukses! Mengarahkan...");
-        if ((data.data as User).role === "ADMIN") {
+        if (data.role === "ADMIN") {
           router.replace("/admin/dashboard");
           return;
         }
         router.replace("/dashboard");
       } catch (error) {
-        if (error instanceof AxiosError) {
-          console.error("Login error:", error);
-          toast.error((error.response?.data as ApiResponse).error as string);
-        }
-      } finally {
-        stopLoading();
+        console.error("login error:", error);
+        toast.error((error as Error).message || "Terjadi kesalahan");
       }
     });
   }

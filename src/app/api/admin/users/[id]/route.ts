@@ -24,7 +24,6 @@ export async function GET(
         id: true,
         name: true,
         email: true,
-        role: true,
         createdAt: true,
       },
     });
@@ -61,13 +60,13 @@ export async function PUT(
     }
 
     const updatedUser = await db.user.update({
-      where: { id },
+      where: { id, role: "USER" },
       data: validated.data,
       select: {
         id: true,
         name: true,
         email: true,
-        role: true,
+        createdAt: true,
       },
     });
 
@@ -98,24 +97,8 @@ export async function DELETE(
       return response(404, "User tidak di temukan");
     }
 
-    // Validasi role yang bisa dihapus dengan query dari database
-    const deletableRoles = await db.user.findMany({
-      select: { role: true },
-      distinct: ["role"],
-      where: {
-        role: {
-          not: "ADMIN", // Tidak bisa hapus ADMIN
-        },
-      },
-    });
-
-    const allowedDeletableRoles = deletableRoles.map((u) => u.role);
-
-    if (!allowedDeletableRoles.includes(user.role)) {
-      return response(
-        403,
-        `Hanya user dengan role: ${allowedDeletableRoles.join(", ")} yang bisa dihapus`,
-      );
+    if (user.role !== "USER") {
+      return response(403, "Hanya user dengan role: USER yang bisa dihapus");
     }
 
     await db.user.delete({ where: { id } });

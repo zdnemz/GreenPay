@@ -15,8 +15,6 @@ import { toast } from "sonner";
 import * as React from "react";
 import { z } from "zod";
 import { UserUpdateSchema } from "@/schemas/admin-schema";
-import { ApiResponse } from "@/lib/response";
-import axios, { AxiosError } from "axios";
 import {
   Form,
   FormControl,
@@ -32,10 +30,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { fetcher } from "@/lib/fetcher";
 
 interface EditUserDialogProps {
   user: User;
-  onSuccess: () => void;
+  onSuccess: () => unknown;
 }
 
 export function EditUserDialog({ user, onSuccess }: EditUserDialogProps) {
@@ -53,20 +52,18 @@ export function EditUserDialog({ user, onSuccess }: EditUserDialogProps) {
   const onSubmit = async (data: z.infer<typeof UserUpdateSchema>) => {
     startTransition(async () => {
       try {
-        await axios.put<ApiResponse>(`/api/admin/users/${user.id}`, data, {
-          withCredentials: true,
+        await fetcher({
+          url: `/api/admin/users/${user.id}`,
+          method: "put",
+          config: { withCredentials: true },
         });
 
-        if (onSuccess) onSuccess();
-
+        onSuccess();
         toast.success(`Data user "${data.name}" berhasil disimpan`);
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          console.error("Admin dashboard error:", error);
-          toast.error((error.response?.data as ApiResponse).error as string);
-        }
-      } finally {
         setOpen(false);
+      } catch (error) {
+        console.error("edit User error:", error);
+        toast.error((error as Error).message);
       }
     });
   };

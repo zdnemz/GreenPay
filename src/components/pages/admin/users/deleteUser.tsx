@@ -10,10 +10,9 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
-import { ApiResponse } from "@/lib/response";
 import { User } from "@/types";
+import { fetcher } from "@/lib/fetcher";
 
 interface DeleteUserDialogProps {
   user: User;
@@ -27,18 +26,17 @@ export function DeleteUserDialog({ user, onSuccess }: DeleteUserDialogProps) {
   const handleDelete = async () => {
     startTransition(async () => {
       try {
-        await axios.delete<ApiResponse>(`/api/admin/users/${user.id}`, {
-          withCredentials: true,
+        await fetcher({
+          url: `/api/admin/users/${user.id}`,
+          method: "delete",
+          config: { withCredentials: true },
         });
 
+        onSuccess();
         toast.success(`User "${user.name}" berhasil dihapus`);
-        setOpen(false);
-        if (onSuccess) onSuccess();
       } catch (error) {
-        if (error instanceof AxiosError) {
-          console.error("Delete user error:", error);
-          toast.error((error.response?.data as ApiResponse).error as string);
-        }
+        console.error("delete User error:", error);
+        toast.error((error as Error).message || "Terjadi kesalahan");
       } finally {
         setOpen(false);
       }

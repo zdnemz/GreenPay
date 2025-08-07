@@ -2,8 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
-
-import { ChevronUp, Info, Trophy } from "lucide-react";
+import { ChevronDown, ChevronUp, Info, Minus, Trophy } from "lucide-react";
 
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
@@ -13,45 +12,22 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import EditProfileDialog from "./profileEdit";
-import axios, { AxiosError } from "axios";
-import { ApiResponse } from "@/lib/response";
-import { toast } from "sonner";
-import { UserData } from "@/types";
 import ChangePasswordDialog from "./changePassword";
-import { useLoading } from "@/hooks/useLoading";
+
+import { useFetch } from "@/hooks/useFetch";
+import { UserData } from "@/types";
 
 export default function ProfileSection() {
-  const [user, setUser] = React.useState<UserData | null>(null);
-  const [refreshKey, setRefreshKey] = React.useState<number>(0);
-  const { startLoading, stopLoading } = useLoading("user-dashboard");
-
-  React.useEffect(() => {
-    let canceled = true;
-
-    async function fetchData() {
-      try {
-        if (!canceled) return;
-
-        startLoading();
-        const { data } = await axios.get<ApiResponse>("/api/users/me");
-
-        setUser(data.data as UserData);
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          console.error("Profile error:", error);
-          toast.error((error.response?.data as ApiResponse).error as string);
-        }
-      } finally {
-        stopLoading();
-      }
-    }
-
-    fetchData();
-
-    return () => {
-      canceled = false;
-    };
-  }, [refreshKey, startLoading, stopLoading]);
+  const { data: user, fetch: refetchUser } = useFetch<UserData>({
+    url: "/api/users/me",
+    fetcherParams: {
+      method: "get",
+      config: {
+        withCredentials: true,
+      },
+    },
+    immediate: true,
+  });
 
   return (
     <section>
@@ -60,26 +36,27 @@ export default function ProfileSection() {
           <Image
             src="/banner.png"
             alt="banner"
-            width={1920} // optional
-            height={400} // optional
+            width={960}
+            height={200}
+            priority
             className="h-32 w-full object-cover sm:h-40 md:h-48"
           />
         </div>
 
         {/* profile */}
-        <div className="space-y-4 px-4 py-6 sm:space-y-6 sm:px-8 md:px-12 md:py-8">
-          <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
+        <div className="space-y-4 px-4 py-6 sm:px-8 md:px-12 md:py-8 lg:space-y-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:justify-between">
             {/* user info */}
-            <div className="flex flex-col gap-4 sm:flex-row sm:gap-x-6">
+            <div className="flex flex-col gap-4 lg:flex-row lg:gap-x-6">
               <div className="relative w-fit -translate-y-8 sm:-translate-y-12 md:-translate-y-16">
                 <Avatar className="h-20 w-20 sm:h-24 sm:w-24 md:h-32 md:w-32">
                   <AvatarImage src="/avatar.png" alt="User Avatar" />
                 </Avatar>
               </div>
 
-              <div className="-mt-4 space-y-1 sm:mt-0">
+              <div className="-mt-8 space-y-1 sm:-mt-12 md:-mt-16 lg:mt-0">
                 <div>
-                  <h2 className="text-primary text-xl font-semibold sm:text-2xl">
+                  <h2 className="text-primary text-xl font-semibold break-words sm:text-2xl">
                     {user?.name}
                   </h2>
                 </div>
@@ -95,7 +72,7 @@ export default function ProfileSection() {
                       </TooltipContent>
                     </Tooltip>
                   </p>
-                  <h3>{user?.points} pts.</h3>
+                  <h3>{user?.points ?? "-"} pts.</h3>
                 </div>
                 <div>
                   <p className="text-muted-foreground flex items-center gap-x-1 text-sm">
@@ -103,19 +80,47 @@ export default function ProfileSection() {
                     <Trophy className="h-4 w-4" />
                   </p>
                   <h3 className="flex items-center gap-x-1">
-                    {user?.rank} st{" "}
-                    <ChevronUp className="text-primary h-4 w-4" />
+                    {user?.currentRank ?? "-"} st{" "}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        {typeof user?.currentRank === "number" &&
+                        typeof user?.lastRank === "number" ? (
+                          user.currentRank > user.lastRank ? (
+                            <ChevronUp className="text-primary h-4 w-4" />
+                          ) : user.currentRank < user.lastRank ? (
+                            <ChevronDown className="text-primary h-4 w-4" />
+                          ) : (
+                            <Minus className="text-primary h-4 w-4" />
+                          )
+                        ) : (
+                          <Info className="text-muted-foreground h-4 w-4" />
+                        )}
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-48 text-center">
+                        <p>
+                          {typeof user?.currentRank === "number" &&
+                          typeof user?.lastRank === "number"
+                            ? user.currentRank > user.lastRank
+                              ? "Peringkatmu naik"
+                              : user.currentRank < user.lastRank
+                                ? "Peringkatmu turun"
+                                : "Peringkatmu tidak berubah"
+                            : "Data peringkat belum tersedia"}
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
                   </h3>
                 </div>
               </div>
             </div>
 
-            <div className="w-full space-x-3 sm:w-auto">
-              <ChangePasswordDialog />
-              <EditProfileDialog
-                user={user!}
-                onSuccess={() => setRefreshKey((v) => v + 1)}
-              />
+            <div className="flex w-full gap-3 sm:w-auto">
+              {user && (
+                <>
+                  <ChangePasswordDialog />
+                  <EditProfileDialog user={user} onSuccess={refetchUser} />
+                </>
+              )}
             </div>
           </div>
 
@@ -124,13 +129,13 @@ export default function ProfileSection() {
             <div>
               <h3 className="text-sm sm:text-base">User ID</h3>
               <p className="text-muted-foreground text-xs sm:text-sm">
-                {user?.id}
+                {user?.id ?? "-"}
               </p>
             </div>
             <div>
               <h3 className="text-sm sm:text-base">Email</h3>
               <p className="text-muted-foreground text-xs sm:text-sm">
-                {user?.email}
+                {user?.email ?? "-"}
               </p>
             </div>
             <div>

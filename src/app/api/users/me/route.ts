@@ -25,7 +25,9 @@ export async function GET(req: NextRequest) {
         id: true,
         name: true,
         email: true,
-        balance: true,
+        points: true,
+        lastRank: true,
+        currentRank: true,
         role: true,
         createdAt: true,
       },
@@ -33,29 +35,7 @@ export async function GET(req: NextRequest) {
 
     if (!user) return response(404, "Pengguna tidak ditemukan");
 
-    // Hitung total points semua user
-    const allPoints = await db.transaction.groupBy({
-      by: ["userId"],
-      _sum: {
-        points: true,
-      },
-      orderBy: {
-        _sum: {
-          points: "desc",
-        },
-      },
-    });
-
-    const pointEntry = allPoints.find((p) => p.userId === user.id);
-    const userPoints = pointEntry?._sum.points ?? 0;
-    let rank = allPoints.findIndex((p) => p.userId === user.id);
-    rank = rank === -1 ? allPoints.length + 1 : rank + 1;
-
-    return response(200, {
-      ...user,
-      points: userPoints,
-      rank,
-    });
+    return response(200, user);
   } catch (err) {
     console.error(`Error getting current user : ${(err as Error).message}`);
     return response(500, "Terjadi kesalahan server");

@@ -12,3 +12,20 @@ export function convertBigInt(obj: unknown) {
     ),
   );
 }
+
+export function buildUrlWithParams(
+  baseUrl: string,
+  params?: Record<string, unknown>,
+): string {
+  if (!params) return baseUrl;
+
+  const url = new URL(baseUrl, window.location.origin);
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      url.searchParams.set(key, String(value));
+    }
+  });
+
+  return url.pathname + url.search;
+}

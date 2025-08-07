@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
     const user = await db.user.findUnique({
       where: { id: userId },
-      select: { id: true, name: true, role: true, email: true },
+      select: { id: true, name: true, email: true, role: true, points: true },
     });
 
     if (!user) {
@@ -51,7 +51,10 @@ export async function POST(req: NextRequest) {
       },
       include: {
         user: {
-          select: { id: true, name: true, email: true, balance: true },
+          select: {
+            id: true,
+            name: true,
+          },
         },
         petugas: {
           select: { id: true, name: true },
@@ -60,13 +63,9 @@ export async function POST(req: NextRequest) {
     });
 
     return response(201, {
-      message: "Transaksi berhasil dibuat dan menunggu persetujuan",
-      transaction: {
-        ...transaction,
-        weightKg: weight,
-        pointsPerKg: POINTS_CONFIG.POINTS_PER_KG[trashType],
-        estimatedBalance: points * POINTS_CONFIG.POINTS_TO_RUPIAH,
-      },
+      ...transaction,
+      weightKg: weight,
+      pointsPerKg: POINTS_CONFIG.POINTS_PER_KG[trashType],
     });
   } catch (error) {
     console.error("Error creating transaction:", error);

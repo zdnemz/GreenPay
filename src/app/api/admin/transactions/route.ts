@@ -16,8 +16,12 @@ export async function GET(req: Request) {
     const mine = searchParams.get("mine") === "true";
 
     const rawStatus = searchParams.get("status");
-    const isValidStatus = rawStatus && Object.values(Status).includes(rawStatus.toUpperCase() as Status);
-    const status = isValidStatus ? rawStatus.toUpperCase() as Status : undefined;
+    const isValidStatus =
+      rawStatus &&
+      Object.values(Status).includes(rawStatus.toUpperCase() as Status);
+    const status = isValidStatus
+      ? (rawStatus.toUpperCase() as Status)
+      : undefined;
 
     const transactions = await db.transaction.findMany({
       where: {

@@ -15,8 +15,6 @@ import { toast } from "sonner";
 import * as React from "react";
 import { z } from "zod";
 import { PetugasUpdateSchema } from "@/schemas/admin-schema";
-import { ApiResponse } from "@/lib/response";
-import axios, { AxiosError } from "axios";
 import {
   Form,
   FormControl,
@@ -25,6 +23,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { fetcher } from "@/lib/fetcher";
 
 interface EditpetugasDialogProps {
   petugas: User;
@@ -45,23 +44,22 @@ export function EditPetugasDialog({
 
   const [open, setOpen] = React.useState(false);
 
-  const onSubmit = async (data: z.infer<typeof PetugasUpdateSchema>) => {
+  const onSubmit = async (values: z.infer<typeof PetugasUpdateSchema>) => {
     startTransition(async () => {
       try {
-        await axios.put<ApiResponse>(`/api/admin/petugas/${petugas.id}`, data, {
-          withCredentials: true,
+        await fetcher<User>({
+          url: `/api/admin/petugas/${petugas.id}`,
+          method: "put",
+          data: values,
+          config: { withCredentials: true },
         });
 
-        if (onSuccess) onSuccess();
-
-        toast.success(`Data petugas "${data.name}" berhasil disimpan`);
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          console.error("Admin dashboard error:", error);
-          toast.error((error.response?.data as ApiResponse).error as string);
-        }
-      } finally {
+        onSuccess();
+        toast.success(`Data petugas "${values.name}" berhasil disimpan`);
         setOpen(false);
+      } catch (error) {
+        console.error("edit Petugas error:", error);
+        toast.error((error as Error).message || "Terjadi kesalahan");
       }
     });
   };

@@ -2,11 +2,9 @@ import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { response } from "@/lib/response";
 import { getUserFromSession } from "@/lib/session";
-import { idTransactionSchema } from "@/schemas/transaction-schema";
-import { treeifyError } from "zod";
 
 export async function PATCH(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
@@ -16,15 +14,7 @@ export async function PATCH(
       return response(401, "Hanya petugas yang dapat menolak transaksi");
     }
 
-    const parsed = idTransactionSchema.safeParse(params);
-    if (!parsed.success) {
-      return response(400, {
-        message: "Validasi gagal",
-        errors: treeifyError(parsed.error),
-      });
-    }
-
-    const { id } = parsed.data;
+    const { id } = await params;
 
     const transaction = await db.transaction.findUnique({
       where: { id },
@@ -56,7 +46,7 @@ export async function PATCH(
       );
     }
 
-    const updatedTransaction = await db.transaction.update({
+    const updated = await db.transaction.update({
       where: { id },
       data: { status: "REJECTED" },
       include: {
@@ -66,8 +56,7 @@ export async function PATCH(
     });
 
     return response(200, {
-      message: "Transaksi berhasil ditolak.",
-      transaction: updatedTransaction,
+      updated,
     });
   } catch (error) {
     console.error("Error rejecting transaction:", error);

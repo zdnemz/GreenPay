@@ -2,12 +2,9 @@ import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { response } from "@/lib/response";
 import { getUserFromSession } from "@/lib/session";
-import { pointsToBalance } from "@/lib/points";
-import { idTransactionSchema } from "@/schemas/transaction-schema";
-import { treeifyError } from "zod";
 
 export async function PATCH(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
@@ -17,36 +14,16 @@ export async function PATCH(
       return response(401, "Hanya petugas yang dapat menyetujui transaksi");
     }
 
-    // Await params untuk mendapatkan nilai yang sebenarnya
-    const resolvedParams = await params;
-
-    // Validasi ID dengan Zod
-    const parse = idTransactionSchema.safeParse(resolvedParams);
-
-    if (!parse.success) {
-      return response(400, {
-        message: "Validasi gagal",
-        errors: treeifyError(parse.error),
-      });
-    }
-
-    const { id } = parse.data;
+    const { id } = await params;
 
     const transaction = await db.transaction.findUnique({
       where: { id },
       include: {
         user: {
-          select: {
-            id: true,
-            name: true,
-            balance: true,
-          },
+          select: { id: true, name: true, points: true },
         },
         petugas: {
-          select: {
-            id: true,
-            name: true,
-          },
+          select: { id: true, name: true },
         },
       },
     });
@@ -62,68 +39,43 @@ export async function PATCH(
       );
     }
 
-    if (
-      sessionUser.role === "PETUGAS" &&
-      transaction.petugasId !== sessionUser.id
-    ) {
+    if (transaction.petugasId !== sessionUser.id) {
       return response(
         403,
         "Anda hanya bisa menyetujui transaksi yang Anda buat sendiri",
       );
     }
 
-    const balanceToAdd = pointsToBalance(transaction.points);
-
     const result = await db.$transaction(async (prisma) => {
       const updatedTransaction = await prisma.transaction.update({
         where: { id },
-        data: {
-          status: "APPROVED",
-        },
+        data: { status: "APPROVED" },
         include: {
           user: {
-            select: {
-              id: true,
-              name: true,
-              balance: true,
-            },
+            select: { id: true, name: true },
           },
           petugas: {
-            select: {
-              id: true,
-              name: true,
-            },
+            select: { id: true, name: true },
           },
         },
       });
 
-      const updatedUser = await prisma.user.update({
+      await prisma.user.update({
         where: { id: transaction.userId },
         data: {
-          balance: {
-            increment: balanceToAdd,
-          },
+          points: { increment: transaction.points },
         },
         select: {
           id: true,
           name: true,
-          balance: true,
+          points: true,
         },
       });
 
-      return { transaction: updatedTransaction, user: updatedUser };
+      return updatedTransaction;
     });
 
-    return response(200, {
-      message: `Transaksi berhasil disetujui. Saldo ${result.user.name} bertambah Rp ${balanceToAdd.toLocaleString()}`,
-      transaction: result.transaction,
-      user: {
-        ...result.user,
-        previousBalance: transaction.user.balance,
-        newBalance: result.user.balance,
-        addedBalance: balanceToAdd,
-      },
-    });
+    return response(200, result);
   } catch (error) {
     console.error("Error approving transaction:", error);
     return response(500, "Terjadi kesalahan saat menyetujui transaksi");
