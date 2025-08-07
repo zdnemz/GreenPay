@@ -16,6 +16,7 @@ import ChangePasswordDialog from "./changePassword";
 
 import { useFetch } from "@/hooks/useFetch";
 import { UserData } from "@/types";
+import { formatOrdinalNumber } from "@/lib/utils";
 
 export default function ProfileSection() {
   const { data: user, fetch: refetchUser } = useFetch<UserData>({
@@ -80,17 +81,19 @@ export default function ProfileSection() {
                     <Trophy className="h-4 w-4" />
                   </p>
                   <h3 className="flex items-center gap-x-1">
-                    {user?.currentRank ?? "-"} st{" "}
+                    {user?.currentRank
+                      ? formatOrdinalNumber(user.currentRank)
+                      : "-"}
                     <Tooltip>
                       <TooltipTrigger asChild>
                         {typeof user?.currentRank === "number" &&
                         typeof user?.lastRank === "number" ? (
-                          user.currentRank > user.lastRank ? (
+                          user.currentRank < user.lastRank ? (
                             <ChevronUp className="text-primary h-4 w-4" />
-                          ) : user.currentRank < user.lastRank ? (
-                            <ChevronDown className="text-primary h-4 w-4" />
+                          ) : user.currentRank > user.lastRank ? (
+                            <ChevronDown className="text-destructive h-4 w-4" />
                           ) : (
-                            <Minus className="text-primary h-4 w-4" />
+                            <Minus className="text-muted-foreground h-4 w-4" />
                           )
                         ) : (
                           <Info className="text-muted-foreground h-4 w-4" />
@@ -100,9 +103,9 @@ export default function ProfileSection() {
                         <p>
                           {typeof user?.currentRank === "number" &&
                           typeof user?.lastRank === "number"
-                            ? user.currentRank > user.lastRank
+                            ? user.currentRank < user.lastRank
                               ? "Peringkatmu naik"
-                              : user.currentRank < user.lastRank
+                              : user.currentRank > user.lastRank
                                 ? "Peringkatmu turun"
                                 : "Peringkatmu tidak berubah"
                             : "Data peringkat belum tersedia"}

@@ -14,7 +14,6 @@ import { User } from "@/generated/prisma/client";
 import { Button } from "@/components/ui/button";
 import RootLayout from "@/components/layouts/RootLayout";
 import Loading from "@/components/Loading";
-import { useLoading } from "@/hooks/useLoading";
 
 export const withAuth = <P extends object>(
   Component: React.ComponentType<P>,
@@ -25,11 +24,10 @@ export const withAuth = <P extends object>(
     const isAuthenticated = useIsAuthenticated();
     const isInitialized = useIsInitialized();
     const user = useAuthUser();
-    const { isAnyLoading } = useLoading();
 
     const router = useRouter();
 
-    const shouldBlockRender = !isInitialized || isAnyLoading;
+    const shouldBlockRender = !isInitialized;
 
     useEffect(() => {
       if (isInitialized && !isAuthenticated) {
@@ -74,11 +72,10 @@ export const withGuest = <P extends object>(
   return function GuestComponent(props: P) {
     const isAuthenticated = useIsAuthenticated();
     const isInitialized = useIsInitialized();
-    const { isAnyLoading } = useLoading();
 
     const router = useRouter();
 
-    const shouldBlockRender = !isInitialized || isAnyLoading;
+    const shouldBlockRender = !isInitialized;
 
     useEffect(() => {
       if (isInitialized && isAuthenticated) {

@@ -93,7 +93,9 @@ export default function Users() {
                 {users?.map((user) => (
                   <TableRow key={user.id}>
                     <TableCell className="font-mono text-sm">
-                      {user.id}
+                      <span className="block max-w-20 truncate overflow-hidden text-ellipsis whitespace-nowrap">
+                        {user.id}
+                      </span>
                     </TableCell>
                     <TableCell>{user.email}</TableCell>
                     <TableCell>{user.name}</TableCell>

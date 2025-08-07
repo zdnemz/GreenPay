@@ -29,10 +29,12 @@ import Link from "next/link";
 import { User } from "@/types";
 import { useRouter } from "next/navigation";
 import { fetcher } from "@/lib/fetcher";
+import { useAuthActions } from "@/stores/auth-store";
 
 export default function Login() {
   const [isPending, startTransition] = React.useTransition();
   const router = useRouter();
+  const { setUser } = useAuthActions();
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -50,13 +52,16 @@ export default function Login() {
         });
 
         if (!data) throw new Error();
+        await setUser(data);
 
         toast.success("Login sukses! Mengarahkan...");
         if (data.role === "ADMIN") {
           router.replace("/admin/dashboard");
           return;
+        } else if (data.role === "USER") {
+          router.replace("/dashboard");
+          return;
         }
-        router.replace("/dashboard");
       } catch (error) {
         console.error("login error:", error);
         toast.error((error as Error).message || "Terjadi kesalahan");

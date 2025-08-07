@@ -6,7 +6,7 @@ import { NextRequest } from "next/server";
 export async function POST(req: NextRequest) {
   try {
     const API_KEY = process.env.API_KEY;
-    if (API_KEY) throw new Error("API KEY was not setted");
+    if (!API_KEY) throw new Error("API KEY was not setted");
 
     const headerKey = req.headers.get("x-api-key");
 

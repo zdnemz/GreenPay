@@ -29,3 +29,10 @@ export function buildUrlWithParams(
 
   return url.pathname + url.search;
 }
+
+export function formatOrdinalNumber(num: number): string {
+  const suffixes = ["th", "st", "nd", "rd"];
+  const v = num % 100;
+  const suffix = v >= 11 && v <= 13 ? "th" : suffixes[num % 10] || "th";
+  return `${num}${suffix}`;
+}

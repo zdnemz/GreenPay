@@ -251,6 +251,9 @@ function NavbarAction({
                 <DropdownMenuItem asChild className="cursor-pointer">
                   <Link href="/admin/transactions">Transaksi</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link href="/admin/update">CRON Update</Link>
+                </DropdownMenuItem>
               </>
             )}
             {user?.role === "PETUGAS" && (
@@ -382,6 +385,13 @@ function MobileProfileMenu({
             onClick={onClose}
           >
             Transaksi
+          </Link>
+          <Link
+            href="/admin/update"
+            className="hover:text-primary transition-colors"
+            onClick={onClose}
+          >
+            CRON Update
           </Link>
         </>
       )}
