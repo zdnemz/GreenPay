@@ -21,11 +21,10 @@ interface Props {
   data: AdminAnalyticData["transaksiStatus"] | undefined;
 }
 
-const COLORS = ["var(--muted)", "var(--primary)", "var(--destructive)"];
+const COLORS = ["var(--primary)", "var(--destructive)"];
 
 export default function TransactionStatusChart({ data }: Props) {
   const chartData = [
-    { name: "Pending", value: data?.pending },
     { name: "Approved", value: data?.approved },
     { name: "Rejected", value: data?.rejected },
   ];

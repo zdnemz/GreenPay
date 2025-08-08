@@ -2,7 +2,15 @@
 
 import * as React from "react";
 import Image from "next/image";
-import { ChevronDown, ChevronUp, Info, Minus, Trophy } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Eye,
+  EyeOff,
+  Info,
+  Minus,
+  Trophy,
+} from "lucide-react";
 
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
@@ -17,6 +25,7 @@ import ChangePasswordDialog from "./changePassword";
 import { useFetch } from "@/hooks/useFetch";
 import { UserData } from "@/types";
 import { formatOrdinalNumber } from "@/lib/utils";
+import { useAppActions, useIsBalanceVisible } from "@/stores/app-store";
 
 export default function ProfileSection() {
   const { data: user, fetch: refetchUser } = useFetch<UserData>({
@@ -29,6 +38,9 @@ export default function ProfileSection() {
     },
     immediate: true,
   });
+
+  const isBalanceVisible = useIsBalanceVisible();
+  const { toggleBalanceVisibility } = useAppActions();
 
   return (
     <section>
@@ -56,24 +68,59 @@ export default function ProfileSection() {
               </div>
 
               <div className="-mt-8 space-y-1 sm:-mt-12 md:-mt-16 lg:mt-0">
-                <div>
-                  <h2 className="text-primary text-xl font-semibold break-words sm:text-2xl">
+                <div className="flex max-w-full items-center gap-3">
+                  <h2 className="text-primary line-clamp-2 max-w-[12rem] text-xl font-semibold sm:max-w-[16rem] sm:text-2xl">
                     {user?.name}
                   </h2>
+                  <div className="bg-muted-foreground h-6 w-px" />
+                  <p className="text-muted-foreground whitespace-nowrap">
+                    {user?.points ?? "-"} pts
+                  </p>
                 </div>
+
                 <div>
                   <p className="text-muted-foreground flex items-center gap-x-1 text-sm">
-                    Point saat ini
+                    Balance saat ini
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Info className="h-4 w-4" />
                       </TooltipTrigger>
                       <TooltipContent className="max-w-48 text-center">
-                        <p>jumlah poin yang terkumpul</p>
+                        <p>jumlah balance yang terkumpul</p>
                       </TooltipContent>
                     </Tooltip>
                   </p>
-                  <h3>{user?.points ?? "-"} pts.</h3>
+                  <div className="relative flex items-center gap-2">
+                    <span
+                      className={`block overflow-hidden text-ellipsis whitespace-nowrap transition-all duration-300`}
+                      style={{
+                        maxWidth: isBalanceVisible ? "8rem" : "4rem",
+                      }}
+                    >
+                      {isBalanceVisible
+                        ? user?.balance != null
+                          ? user.balance.toLocaleString()
+                          : "0"
+                        : "******"}
+                    </span>
+
+                    <button
+                      type="button"
+                      aria-label={
+                        isBalanceVisible
+                          ? "Sembunyikan saldo"
+                          : "Tampilkan saldo"
+                      }
+                      onClick={toggleBalanceVisibility}
+                      className="text-muted-foreground hover:text-primary flex-shrink-0 transition-colors duration-200"
+                    >
+                      {isBalanceVisible ? (
+                        <EyeOff size={16} />
+                      ) : (
+                        <Eye size={16} />
+                      )}
+                    </button>
+                  </div>
                 </div>
                 <div>
                   <p className="text-muted-foreground flex items-center gap-x-1 text-sm">

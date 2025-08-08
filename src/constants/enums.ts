@@ -1,10 +1,10 @@
-export enum Role {
+export enum role {
   USER = "USER",
   PETUGAS = "PETUGAS",
   ADMIN = "ADMIN",
 }
 
-export enum TrashType {
+export enum trashType {
   PLASTIC = "PLASTIC",
   PAPER = "PAPER",
   METAL = "METAL",
@@ -12,7 +12,7 @@ export enum TrashType {
   OTHER = "OTHER",
 }
 
-export enum Status {
+export enum status {
   APPROVED = "APPROVED",
   REJECTED = "REJECTED",
 }

@@ -34,7 +34,7 @@ export default function TransactionChart({ data }: Props) {
         <CardTitle className="text-lg font-semibold">
           Statistik Transaksi Bulanan
         </CardTitle>
-        <CardDescription>Jumlah transaksi tiap bulan</CardDescription>
+        <CardDescription>{"Jumlah transaksi tiap bulan (Kg)"}</CardDescription>
       </CardHeader>
 
       <CardContent className="px-4 pt-6 sm:px-6">

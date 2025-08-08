@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  Pagination,
+  Pagination as PaginationRoot,
   PaginationContent,
   PaginationEllipsis,
   PaginationItem,
@@ -10,17 +10,17 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-interface PaginationComponentProps {
+interface PaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
 }
 
-export default function PaginationComponent({
+export default function Pagination({
   currentPage,
   totalPages,
   onPageChange,
-}: PaginationComponentProps) {
+}: PaginationProps) {
   const getPageNumbers = (): (number | "ellipsis")[] => {
     const pages: (number | "ellipsis")[] = [];
 
@@ -60,7 +60,7 @@ export default function PaginationComponent({
   };
 
   return (
-    <Pagination>
+    <PaginationRoot>
       <PaginationContent>
         {/* Previous Button */}
         <PaginationItem>
@@ -110,6 +110,6 @@ export default function PaginationComponent({
           />
         </PaginationItem>
       </PaginationContent>
-    </Pagination>
+    </PaginationRoot>
   );
 }

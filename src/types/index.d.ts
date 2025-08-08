@@ -1,4 +1,5 @@
 import { Role, Status, TrashType } from "@/generated/prisma";
+import { Decimal } from "@/generated/prisma/runtime/library";
 
 export interface Pagination {
   page: number;
@@ -27,39 +28,29 @@ export interface UserData {
   id: string;
   email: string;
   points: number;
+  balance: Decimal;
   currentRank: number | null;
   lastRank: number | null;
   role: Role;
   createdAt: Date;
 }
 
+// ======================== interface leaderboard routes ========================
 export interface LeaderboardData {
   users: {
-    rank: number;
-    id: string;
     name: string;
-    role: string;
-    points: number;
-  }[];
-  myRank: number;
-  myPoints: number;
-  role: Role.USER;
-  page: number;
-}
-
-export interface TransactionData {
-  data: {
     id: string;
-    createdAt: Date;
-    userId: string;
-    petugasId: string | null;
-    trashType: TrashType;
     points: number;
-    status: Status;
+    currentRank: number | null;
   }[];
-  page: number;
-  total: number;
-  totalPages: number;
+  me:
+    | {
+        name: string;
+        id: string;
+        points: number;
+        currentRank: number | null;
+      }
+    | undefined;
 }
 
 export interface AdminAnalyticData {
@@ -67,7 +58,7 @@ export interface AdminAnalyticData {
   totalPetugas: number;
   totalTransaksi: number;
   totalSampah: {
-    type: TrashType;
+    type: $Enums.TrashType;
     total: number;
   }[];
   transaksiPerBulan: {
@@ -76,7 +67,6 @@ export interface AdminAnalyticData {
     jumlah: number;
   }[];
   transaksiStatus: {
-    pending: number;
     approved: number;
     rejected: number;
   };
@@ -87,4 +77,69 @@ export interface AdminUserData {
   email: string;
   name: string;
   createdAt: Date;
+}
+
+// ======================== interface Trash routes ========================
+export interface TrashPrepareData {
+  payload: {
+    userId: string;
+    trash: {
+      trashType: TrashType;
+      weight: number;
+    }[];
+    timestamp: number;
+    expiresAt: number;
+  };
+  signature: string;
+}
+
+interface TrashHistory {
+  status: Status;
+  signature: string;
+  id: string;
+  createdAt: Date;
+  petugas: {
+    name: string;
+    id: string;
+  } | null;
+  items: {
+    trashType: TrashType;
+    weight: number;
+    points: number;
+  }[];
+}
+
+export type TrashHistoryData = TrashHistory[];
+
+export interface TrashSubmitData {
+  id: string;
+  status: Status;
+  createdAt: Date;
+  signature: string;
+  petugas: {
+    name: string;
+    id: string;
+  } | null;
+  items: {
+    trashType: TrashType;
+    weight: number;
+    id: string;
+    points: number;
+    trashTrashId: string;
+  }[];
+  totalPoints: number;
+  totalWeight: number;
+}
+
+export interface TrashVerifyData {
+  payload: {
+    userId: string;
+    trash: {
+      trashType: TrashType;
+      weight: number;
+    }[];
+    timestamp: number;
+    expiresAt: number;
+  };
+  signature: string;
 }

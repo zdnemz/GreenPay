@@ -249,9 +249,6 @@ function NavbarAction({
                   <Link href="/admin/petugas">Manajemen Petugas</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link href="/admin/transactions">Transaksi</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild className="cursor-pointer">
                   <Link href="/admin/update">CRON Update</Link>
                 </DropdownMenuItem>
               </>
@@ -273,7 +270,7 @@ function NavbarAction({
                   <Link href="/dashboard">Dashboard</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link href="/transactions">Riwayat Transaksi</Link>
+                  <Link href="/trash">Setor Sampah</Link>
                 </DropdownMenuItem>
               </>
             )}
@@ -380,13 +377,6 @@ function MobileProfileMenu({
             Manajemen Petugas
           </Link>
           <Link
-            href="/admin/transactions"
-            className="hover:text-primary transition-colors"
-            onClick={onClose}
-          >
-            Transaksi
-          </Link>
-          <Link
             href="/admin/update"
             className="hover:text-primary transition-colors"
             onClick={onClose}
@@ -425,11 +415,11 @@ function MobileProfileMenu({
             Dashboard
           </Link>
           <Link
-            href="/transactions"
+            href="/trash"
             className="hover:text-primary transition-colors"
             onClick={onClose}
           >
-            Riwayat Transaksi
+            Setor Sampah
           </Link>
         </>
       )}

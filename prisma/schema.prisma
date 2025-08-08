@@ -15,40 +15,82 @@ model User {
   email       String   @unique
   password    String
   points      Int      @default(0)
+  balance     Decimal  @default(0.00) @db.Decimal(18, 2)
   currentRank Int?
   lastRank    Int?
   role        Role     @default(USER)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  // Relation
-  transactions Transaction[] @relation("UserTransactions")
-  handled      Transaction[] @relation("PetugasTransactions")
+  deposits     TrashDeposit[]       @relation("UserDeposits")
+  handledSetor TrashDeposit[]       @relation("HandledSetor")
+  balanceTxs   BalanceTransaction[]
+  withdraws    WithdrawRequest[]
 }
 
-model Transaction {
-  id        String  @id @default(uuid())
-  user      User    @relation("UserTransactions", fields: [userId], references: [id])
-  userId    String
-  petugas   User?   @relation("PetugasTransactions", fields: [petugasId], references: [id])
+model TrashDeposit {
+  id     String @id @default(uuid())
+  user   User   @relation("UserDeposits", fields: [userId], references: [id])
+  userId String
+
+  petugas   User?   @relation("HandledSetor", fields: [petugasId], references: [id])
   petugasId String?
 
   status    Status
   createdAt DateTime @default(now())
-
   signature String
 
-  items TransactionItem[]
+  items TrashDepositItem[]
 }
 
-model TransactionItem {
-  id            String      @id @default(uuid())
-  transaction   Transaction @relation(fields: [transactionId], references: [id])
-  transactionId String
+model TrashDepositItem {
+  id             String       @id @default(uuid())
+  trashDeposit   TrashDeposit @relation(fields: [trashDepositId], references: [id])
+  trashDepositId String
 
   trashType TrashType
   weight    Float
   points    Int
+}
+
+model BalanceTransaction {
+  id     String @id @default(uuid())
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  amount  Decimal        @db.Decimal(18, 2)
+  reason  String
+  refType BalanceRefType
+  refId   String?
+
+  createdAt DateTime @default(now())
+}
+
+model WithdrawRequest {
+  id     String @id @default(uuid())
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  amount      Decimal @db.Decimal(18, 2)
+  method      String
+  destination String
+
+  status     WithdrawStatus
+  createdAt  DateTime       @default(now())
+  approvedAt DateTime?
+}
+
+enum BalanceRefType {
+  REWARD // dari setor sampah
+  WITHDRAW // permintaan tarik saldo
+  VOUCHER // tukar dengan voucher
+  MANUAL // admin adjustment
+}
+
+enum WithdrawStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 enum Role {

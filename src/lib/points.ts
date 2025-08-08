@@ -3,21 +3,22 @@ import { TrashType } from "@/generated/prisma/client";
 export const POINTS_CONFIG = {
   // Points per kg untuk setiap jenis sampah
   POINTS_PER_KG: {
-    PLASTIC: 15, // 15 points per kg
-    PAPER: 8, // 8 points per kg
-    METAL: 25, // 25 points per kg
-    ORGANIC: 5, // 5 points per kg
-    OTHER: 3, // 3 points per kg
+    PLASTIC: 10, // Plastik bernilai sedang
+    PAPER: 6, // Kertas cenderung murah
+    METAL: 20, // Logam punya nilai tinggi
+    ORGANIC: 2, // Organik bernilai rendah
+    OTHER: 1, // Lain-lain sulit didaur ulang
   } as Record<TrashType, number>,
 
-  // Conversion rate: 1 point = Rp 100
-  POINTS_TO_RUPIAH: 100,
+  // Conversion rate: 1 point = Rp 50
+  // Jadi 1 kg plastik = 10 poin = Rp 500
+  POINTS_TO_RUPIAH: 50,
 
   // Minimum weight untuk transaksi (dalam kg)
   MIN_WEIGHT: 0.1,
 
   // Maximum weight untuk transaksi (dalam kg)
-  MAX_WEIGHT: 100,
+  MAX_WEIGHT: 20, // Batas 20 kg per transaksi lebih realistis & manageable
 };
 
 // Helper function untuk hitung points
