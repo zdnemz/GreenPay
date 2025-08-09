@@ -41,7 +41,6 @@ function TrashVerifyPage() {
   const { setQRData } = useQRActions();
   const router = useRouter();
 
-  // Reset semua state ke kondisi awal
   const resetToInitialState = () => {
     stopScan();
     stopCamera();
@@ -55,15 +54,10 @@ function TrashVerifyPage() {
     }
   };
 
-  // Fungsi verifikasi data langsung fetch
   const verifyData = async (encoded: string) => {
     try {
       const decoded = decoder<{ p: string; s: string }>(encoded);
-
-      const finalData = {
-        payloadId: decoded.p,
-        signature: decoded.s,
-      };
+      const finalData = { payloadId: decoded.p, signature: decoded.s };
 
       const { data } = await fetcher<TrashVerifyData>({
         url: "/api/trash/verify",
@@ -77,7 +71,6 @@ function TrashVerifyPage() {
       setQRData(data);
       toast.success("Verifikasi berhasil");
 
-      // Reset ke kondisi awal setelah berhasil
       setTimeout(() => {
         resetToInitialState();
       }, 500);
@@ -86,15 +79,12 @@ function TrashVerifyPage() {
     } catch (error) {
       console.error("trash Verify error:", error);
       toast.error((error as Error).message || "Terjadi kesalahan");
-
-      // Reset ke kondisi awal setelah error
       setTimeout(() => {
         resetToInitialState();
       }, 1000);
     }
   };
 
-  // Start camera stream
   const startCamera = async () => {
     if (
       !selectedDeviceId ||
@@ -104,8 +94,10 @@ function TrashVerifyPage() {
     )
       return;
 
+    let constraints: MediaStreamConstraints;
+
     try {
-      let constraints = {
+      constraints = {
         video: {
           deviceId: { exact: selectedDeviceId },
           width: { ideal: 640 },
@@ -118,13 +110,10 @@ function TrashVerifyPage() {
       try {
         stream = await navigator.mediaDevices.getUserMedia(constraints);
       } catch (error) {
-        console.warn(
-          "Failed with exact deviceId, trying without exact constraint:",
-          error,
-        );
+        console.warn("Exact deviceId failed, retry without exact:", error);
+
         constraints = {
           video: {
-            deviceId: { exact: selectedDeviceId },
             width: { ideal: 640 },
             height: { ideal: 480 },
             facingMode: { ideal: "environment" },
@@ -136,11 +125,8 @@ function TrashVerifyPage() {
       if (videoRef.current && mountedRef.current) {
         videoRef.current.srcObject = stream;
         setCameraActive(true);
-
         videoRef.current.onloadedmetadata = () => {
-          if (videoRef.current) {
-            videoRef.current.play().catch(console.error);
-          }
+          videoRef.current?.play().catch(console.error);
         };
       }
     } catch (error) {
@@ -162,7 +148,6 @@ function TrashVerifyPage() {
     }
   };
 
-  // Stop camera stream
   const stopCamera = () => {
     if (videoRef.current && videoRef.current.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
@@ -172,7 +157,6 @@ function TrashVerifyPage() {
     setCameraActive(false);
   };
 
-  // Start scanning QR code
   const startScan = async () => {
     if (
       !selectedDeviceId ||
@@ -197,7 +181,6 @@ function TrashVerifyPage() {
             scanningRef.current = false;
             codeReader.current?.reset();
             setScanning(false);
-
             startTransition(async () => {
               await verifyData(result.getText());
             });
@@ -211,18 +194,14 @@ function TrashVerifyPage() {
     }
   };
 
-  // Stop scanning
   const stopScan = () => {
     scanningRef.current = false;
     setScanning(false);
     codeReader.current?.reset();
   };
 
-  // Handle tab change
   const handleTabChange = (tab: TabType) => {
     if (tab === activeTab) return;
-
-    // Clean up current tab
     if (activeTab === "camera") {
       stopScan();
       stopCamera();
@@ -230,18 +209,14 @@ function TrashVerifyPage() {
       URL.revokeObjectURL(uploadedImage);
       setUploadedImage(null);
     }
-
     setActiveTab(tab);
   };
 
-  // Handle camera tab actions
   const handleCameraAction = async () => {
     if (!cameraActive) {
       await startCamera();
       setTimeout(() => {
-        if (mountedRef.current) {
-          startScan();
-        }
+        if (mountedRef.current) startScan();
       }, 500);
     } else if (scanning) {
       stopScan();
@@ -250,12 +225,10 @@ function TrashVerifyPage() {
     }
   };
 
-  // Scan dari gambar (upload)
   const handleScanFromImage = async (file: File) => {
     const img = document.createElement("img");
     const imageUrl = URL.createObjectURL(file);
     img.src = imageUrl;
-
     setUploadedImage(imageUrl);
     setScanning(true);
 
@@ -285,7 +258,6 @@ function TrashVerifyPage() {
     };
   };
 
-  // Clear uploaded image
   const clearUploadedImage = () => {
     if (uploadedImage) {
       URL.revokeObjectURL(uploadedImage);
@@ -293,7 +265,6 @@ function TrashVerifyPage() {
     }
   };
 
-  // Initialize cameras on mount
   useEffect(() => {
     mountedRef.current = true;
     codeReader.current = new BrowserMultiFormatReader();
@@ -302,32 +273,30 @@ function TrashVerifyPage() {
       .getUserMedia({ video: true })
       .then((stream) => {
         if (!mountedRef.current) return;
-
         stream.getTracks().forEach((track) => track.stop());
 
         codeReader.current
           ?.listVideoInputDevices()
           .then((videoInputDevices) => {
             if (!mountedRef.current) return;
-
             setDevices(videoInputDevices);
-
-            console.log(videoInputDevices);
 
             if (videoInputDevices.length > 0) {
               let defaultCamera = videoInputDevices.find(
                 (device) =>
-                  !device.label.toLowerCase().includes("front") &&
-                  !device.label.toLowerCase().includes("user") &&
-                  !device.label.toLowerCase().includes("virtual"),
+                  device.label.toLowerCase().includes("back") ||
+                  device.label.toLowerCase().includes("rear") ||
+                  device.label.toLowerCase().includes("environment") ||
+                  device.label.toLowerCase().includes("wide") ||
+                  device.label.toLowerCase().includes("telephoto"),
               );
 
               if (!defaultCamera) {
                 defaultCamera = videoInputDevices.find(
                   (device) =>
-                    device.label.toLowerCase().includes("back") ||
-                    device.label.toLowerCase().includes("rear") ||
-                    device.label.toLowerCase().includes("environment"),
+                    !device.label.toLowerCase().includes("front") &&
+                    !device.label.toLowerCase().includes("user") &&
+                    !device.label.toLowerCase().includes("virtual"),
                 );
               }
 
@@ -336,11 +305,7 @@ function TrashVerifyPage() {
               }
 
               setSelectedDeviceId(defaultCamera.deviceId);
-              console.log(defaultCamera);
             }
-          })
-          .catch((error) => {
-            console.error("Error listing video devices:", error);
           });
       })
       .catch((error) => {
@@ -357,19 +322,15 @@ function TrashVerifyPage() {
     };
   }, []);
 
-  // Upload image handler
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !mountedRef.current) return;
-
     await handleScanFromImage(file);
     e.target.value = "";
   };
 
-  // Toggle kamera depan/belakang
   const toggleCamera = () => {
-    if (devices.length < 2 || !mountedRef.current || !scanning) return;
-
+    if (devices.length < 2 || !mountedRef.current) return;
     const currentIndex = devices.findIndex(
       (d) => d.deviceId === selectedDeviceId,
     );
@@ -377,16 +338,13 @@ function TrashVerifyPage() {
 
     stopScan();
     stopCamera();
-
     setSelectedDeviceId(devices[nextIndex].deviceId);
 
     setTimeout(async () => {
       if (mountedRef.current) {
         await startCamera();
         setTimeout(() => {
-          if (mountedRef.current) {
-            startScan();
-          }
+          if (mountedRef.current) startScan();
         }, 500);
       }
     }, 300);
@@ -423,8 +381,7 @@ function TrashVerifyPage() {
                   : "text-gray-600 hover:text-gray-900",
               )}
             >
-              <Camera className="mr-2 inline-block h-4 w-4" />
-              Kamera
+              <Camera className="mr-2 inline-block h-4 w-4" /> Kamera
             </button>
             <button
               onClick={() => handleTabChange("upload")}
@@ -435,8 +392,7 @@ function TrashVerifyPage() {
                   : "text-gray-600 hover:text-gray-900",
               )}
             >
-              <Upload className="mr-2 inline-block h-4 w-4" />
-              Upload
+              <Upload className="mr-2 inline-block h-4 w-4" /> Upload
             </button>
           </div>
 
@@ -452,6 +408,17 @@ function TrashVerifyPage() {
                   autoPlay
                   style={{ display: cameraActive ? "block" : "none" }}
                 />
+
+                {/* Button ganti kamera di frame */}
+                {cameraActive && devices.length > 1 && (
+                  <button
+                    onClick={toggleCamera}
+                    className="absolute top-2 right-2 z-10 rounded-full bg-black/50 p-2 text-white hover:bg-black/70"
+                    title="Ganti Kamera"
+                  >
+                    <RotateCw className="h-5 w-5" />
+                  </button>
+                )}
 
                 {!cameraActive && (
                   <div className="absolute inset-0 flex w-full items-center justify-center bg-gray-200">
@@ -494,7 +461,6 @@ function TrashVerifyPage() {
               </>
             )}
 
-            {/* Loading Overlay */}
             {(scanning || isPending) && (
               <div className="bg-opacity-50 text-foreground absolute inset-0 flex w-full items-center justify-center bg-black/70">
                 <div className="text-center">
@@ -505,7 +471,7 @@ function TrashVerifyPage() {
             )}
           </div>
 
-          {/* Tab Content Actions */}
+          {/* Actions */}
           {activeTab === "camera" ? (
             <div className="flex gap-2">
               <Button
@@ -517,18 +483,6 @@ function TrashVerifyPage() {
                 {getCameraButtonIcon()}
                 {getCameraButtonText()}
               </Button>
-
-              {scanning && devices.length > 1 && (
-                <Button
-                  variant="outline"
-                  onClick={toggleCamera}
-                  disabled={isPending}
-                  className="px-3"
-                  title="Ganti Kamera"
-                >
-                  <RotateCw className="h-4 w-4" />
-                </Button>
-              )}
             </div>
           ) : (
             <div className="flex gap-2">
@@ -539,8 +493,7 @@ function TrashVerifyPage() {
                   variant="outline"
                   className="flex-1"
                 >
-                  <X className="mr-2 h-4 w-4" />
-                  Hapus Gambar
+                  <X className="mr-2 h-4 w-4" /> Hapus Gambar
                 </Button>
               ) : (
                 <Button
@@ -549,8 +502,7 @@ function TrashVerifyPage() {
                   className="flex-1 cursor-pointer bg-[linear-gradient(270deg,var(--chart-1),var(--chart-2),var(--chart-3),var(--chart-4))] bg-[length:200%_200%] shadow transition-all duration-300 hover:shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]"
                 >
                   <label className="flex items-center gap-2">
-                    <Upload className="h-4 w-4" />
-                    Pilih Gambar QR
+                    <Upload className="h-4 w-4" /> Pilih Gambar QR
                     <input
                       type="file"
                       accept="image/*"

@@ -5,7 +5,6 @@ import RootLayout from "@/components/layouts/RootLayout";
 import Pagination from "@/components/Pagination";
 import SimpleNavbar from "@/components/SimpleNavbar";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -41,7 +40,7 @@ function BalanceHistoryPage() {
           </p>
         </div>
 
-        <Card className="p-6 shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]">
+        <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -94,7 +93,7 @@ function BalanceHistoryPage() {
               )}
             </TableBody>
           </Table>
-        </Card>
+        </div>
 
         <div className="flex items-center justify-center">
           <Pagination

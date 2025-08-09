@@ -28,7 +28,7 @@ export interface UserData {
   id: string;
   email: string;
   points: number;
-  balance: Decimal;
+  balance: string;
   currentRank: number | null;
   lastRank: number | null;
   role: Role;

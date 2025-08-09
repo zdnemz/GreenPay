@@ -34,7 +34,11 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    if (!user) return response(404, "Pengguna tidak ditemukan");
+    if (!user) {
+      const res = response(404, "Pengguna tidak ditemukan");
+      res.cookies.delete("auth_token");
+      return res;
+    }
 
     return response(200, user);
   } catch (err) {

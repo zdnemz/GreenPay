@@ -11,33 +11,20 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { withSuspense } from "@/hoc/withSuspense";
 import { usePagination } from "@/hooks/usePagination";
-import { IS_DEV } from "@/lib/config";
-import { MOCK_LEADERBOARD_DATA } from "@/lib/mock";
 import { LeaderboardData } from "@/types";
 import Image from "next/image";
 import * as React from "react";
-import { toast } from "sonner";
 
 export default withSuspense(Leaderboard);
 
 function Leaderboard() {
-  const { data, pagination, handlePageChange } = usePagination<LeaderboardData>(
-    {
-      apiEndpoint: "/api/leaderboard",
-    },
-  );
-
-  // dev info
-  const didToast = React.useRef(false);
-
-  React.useEffect(() => {
-    if (IS_DEV && !didToast.current) {
-      toast.info("This data is MOCK for development");
-      didToast.current = true;
-    }
-  }, []);
-
-  const leaderboard = !IS_DEV ? data : MOCK_LEADERBOARD_DATA;
+  const {
+    data: leaderboard,
+    pagination,
+    handlePageChange,
+  } = usePagination<LeaderboardData>({
+    apiEndpoint: "/api/leaderboard",
+  });
 
   return (
     <RootLayout header={<Navbar />} footer={<Footer />}>

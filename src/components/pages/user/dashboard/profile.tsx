@@ -82,13 +82,13 @@ export default function ProfileSection() {
                       {user?.points ?? "-"} pts
                     </p>
                   </div>
-                  <p className="text-muted-foreground text-xs">
+                  <p className="text-muted-foreground text-sm">
                     {user?.email ?? "-"}
                   </p>
                 </div>
 
                 <div>
-                  <p className="flex items-center gap-x-1 text-sm">
+                  <p className="flex items-center gap-x-1">
                     Balance saat ini
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -101,14 +101,17 @@ export default function ProfileSection() {
                   </p>
                   <div className="relative flex items-center gap-2">
                     <span
-                      className={`block overflow-hidden text-ellipsis whitespace-nowrap transition-all duration-300`}
+                      className={`text-muted-foreground block overflow-hidden text-sm text-ellipsis whitespace-nowrap transition-all duration-300`}
                       style={{
                         maxWidth: isBalanceVisible ? "8rem" : "4rem",
                       }}
                     >
                       {isBalanceVisible
                         ? user?.balance != null
-                          ? user.balance.toLocaleString()
+                          ? new Intl.NumberFormat("id-ID", {
+                              style: "currency",
+                              currency: "IDR",
+                            }).format(Number(user.balance))
                           : "0"
                         : "******"}
                     </span>
@@ -124,19 +127,19 @@ export default function ProfileSection() {
                       className="text-muted-foreground hover:text-primary flex-shrink-0 transition-colors duration-200"
                     >
                       {isBalanceVisible ? (
-                        <EyeOff size={16} />
+                        <EyeOff size={14} />
                       ) : (
-                        <Eye size={16} />
+                        <Eye size={14} />
                       )}
                     </button>
                   </div>
                 </div>
                 <div>
-                  <p className="flex items-center gap-x-1 text-sm">
+                  <p className="flex items-center gap-x-1">
                     Peringkat anda
                     <Trophy className="h-4 w-4" />
                   </p>
-                  <h3 className="flex items-center gap-x-1">
+                  <div className="text-muted-foreground flex items-center gap-x-1 text-sm">
                     {user?.currentRank
                       ? formatOrdinalNumber(user.currentRank)
                       : "-"}
@@ -168,7 +171,7 @@ export default function ProfileSection() {
                         </p>
                       </TooltipContent>
                     </Tooltip>
-                  </h3>
+                  </div>
                 </div>
               </div>
             </div>
@@ -220,7 +223,7 @@ export default function ProfileSection() {
                 </p>
               </Card>
             </Link>
-            <Link href="/withdraw/history" passHref>
+            <Link href="/withdraw" passHref>
               <Card className="hover:border-primary flex h-full cursor-pointer flex-col items-center justify-center gap-2 p-6 transition-all duration-300 hover:shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]">
                 <CreditCard className="text-primary h-12 w-12" />
                 <h3 className="text-primary text-center text-lg font-semibold">

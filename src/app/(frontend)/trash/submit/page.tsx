@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/form";
 import SimpleNavbar from "@/components/SimpleNavbar";
 import { withAuth } from "@/hoc/withAuth";
+import { Plus, Trash } from "lucide-react";
 
 const trashTypes = [
   { value: TrashType.PLASTIC, label: "Plastik" },
@@ -143,7 +144,7 @@ function TrashSubmitPage() {
                               value={fieldProps.value}
                               onValueChange={fieldProps.onChange}
                             >
-                              <SelectTrigger className="w-[150px] flex-shrink-0">
+                              <SelectTrigger className="w-32 flex-shrink-0">
                                 <SelectValue placeholder="Pilih jenis" />
                               </SelectTrigger>
                               <SelectContent>
@@ -171,7 +172,7 @@ function TrashSubmitPage() {
                               step="0.01"
                               min="0.01"
                               placeholder="Berat (kg)"
-                              className="w-[120px] flex-shrink-0"
+                              className="w-full flex-shrink-0"
                               {...fieldProps}
                               onChange={(e) =>
                                 fieldProps.onChange(Number(e.target.value))
@@ -183,7 +184,7 @@ function TrashSubmitPage() {
                       )}
                     />
 
-                    <div className="w-[90px] flex-shrink-0">
+                    <div className="w-6 flex-shrink-0">
                       {fields.length > 1 ? (
                         <Button
                           type="button"
@@ -191,7 +192,7 @@ function TrashSubmitPage() {
                           onClick={() => remove(index)}
                           className="w-full cursor-pointer"
                         >
-                          Hapus
+                          <Trash />
                         </Button>
                       ) : (
                         <div className="invisible">
@@ -200,7 +201,7 @@ function TrashSubmitPage() {
                             variant="destructive"
                             className="w-full cursor-pointer"
                           >
-                            Hapus
+                            <Trash />
                           </Button>
                         </div>
                       )}
@@ -212,7 +213,7 @@ function TrashSubmitPage() {
               <Button
                 type="button"
                 variant="outline"
-                className="cursor-pointer"
+                className="w-32 cursor-pointer"
                 onClick={() => {
                   const usedTypes: TrashType[] = watch("trash").map(
                     (t) => t.trashType,
@@ -225,7 +226,7 @@ function TrashSubmitPage() {
                   }
                 }}
               >
-                + Tambah Jenis
+                <Plus /> Tambah
               </Button>
 
               <Separator />

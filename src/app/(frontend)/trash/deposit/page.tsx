@@ -25,7 +25,7 @@ import RootLayout from "@/components/layouts/RootLayout";
 import Footer from "@/components/Footer";
 import { formatSeconds } from "@/lib/time";
 import SimpleNavbar from "@/components/SimpleNavbar";
-import { Download } from "lucide-react";
+import { Download, Plus, Trash } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { withAuth } from "@/hoc/withAuth";
 import { encoder } from "@/lib/encode";
@@ -193,7 +193,7 @@ function TrashDepositPage() {
   return (
     <RootLayout header={<SimpleNavbar />} footer={<Footer />}>
       <section className="flex min-h-screen w-full items-center justify-center">
-        <Card className="mx-auto max-w-2xl min-w-96 space-y-6 p-6">
+        <Card className="mx-auto max-w-2xl min-w-96 space-y-6 overflow-hidden p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold">Setor Sampah</h2>
           </div>
@@ -215,7 +215,10 @@ function TrashDepositPage() {
                   );
 
                   return (
-                    <div key={field.id} className="flex items-center gap-3">
+                    <div
+                      key={field.id}
+                      className="flex items-center justify-center gap-3"
+                    >
                       <FormField
                         control={control}
                         name={`trash.${index}.trashType`}
@@ -226,7 +229,7 @@ function TrashDepositPage() {
                                 value={fieldProps.value}
                                 onValueChange={fieldProps.onChange}
                               >
-                                <SelectTrigger className="w-[150px] flex-shrink-0">
+                                <SelectTrigger className="w-32 flex-shrink-0">
                                   <SelectValue placeholder="Pilih jenis" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -254,7 +257,7 @@ function TrashDepositPage() {
                                 step="0.01"
                                 min="0.01"
                                 placeholder="Berat (kg)"
-                                className="w-[120px] flex-shrink-0"
+                                className="w-full flex-shrink-0"
                                 {...fieldProps}
                                 onChange={(e) =>
                                   fieldProps.onChange(Number(e.target.value))
@@ -266,24 +269,24 @@ function TrashDepositPage() {
                         )}
                       />
 
-                      <div className="w-[90px] flex-shrink-0">
+                      <div className="w-6 flex-shrink-0">
                         {fields.length > 1 ? (
                           <Button
                             type="button"
                             variant="destructive"
                             onClick={() => remove(index)}
-                            className="w-full"
+                            className=""
                           >
-                            Hapus
+                            <Trash />
                           </Button>
                         ) : (
                           <div className="invisible">
                             <Button
                               type="button"
                               variant="destructive"
-                              className="w-full"
+                              className=""
                             >
-                              Hapus
+                              <Trash />
                             </Button>
                           </div>
                         )}
@@ -295,6 +298,7 @@ function TrashDepositPage() {
                 <Button
                   type="button"
                   variant="outline"
+                  className="w-32 cursor-pointer"
                   onClick={() => {
                     const usedTypes: TrashType[] = watch("trash").map(
                       (t) => t.trashType,
@@ -307,7 +311,7 @@ function TrashDepositPage() {
                     }
                   }}
                 >
-                  + Tambah Jenis
+                  <Plus /> Tambah
                 </Button>
 
                 <Button
