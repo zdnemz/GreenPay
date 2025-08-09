@@ -224,7 +224,10 @@ function NavbarAction({
               Login
             </Link>
           </Button>
-          <Button className="cursor-pointer" asChild>
+          <Button
+            className="cursor-pointer bg-[linear-gradient(270deg,var(--chart-1),var(--chart-2),var(--chart-3),var(--chart-4))] bg-[length:200%_200%] shadow transition-all duration-300 hover:shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]"
+            asChild
+          >
             <Link href="/register" aria-label="Daftar akun GreenPay">
               Daftar
             </Link>
@@ -233,7 +236,10 @@ function NavbarAction({
       ) : (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button aria-label="Menu Profil" className="cursor-pointer">
+            <Button
+              aria-label="Menu Profil"
+              className="cursor-pointer bg-[linear-gradient(270deg,var(--chart-1),var(--chart-2),var(--chart-3),var(--chart-4))] bg-[length:200%_200%] shadow transition-all duration-300 hover:shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]"
+            >
               Profile
             </Button>
           </DropdownMenuTrigger>

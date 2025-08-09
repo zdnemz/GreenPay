@@ -150,7 +150,7 @@ export default function EditProfileDialog({
 
               <Button
                 type="submit"
-                className="w-full cursor-pointer"
+                className="w-full cursor-pointer bg-[linear-gradient(270deg,var(--chart-1),var(--chart-2),var(--chart-3),var(--chart-4))] bg-[length:200%_200%] shadow transition-all duration-300 hover:shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]"
                 disabled={isPending}
               >
                 {isPending ? "Loading..." : "Simpan"}

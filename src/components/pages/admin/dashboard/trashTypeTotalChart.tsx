@@ -33,7 +33,7 @@ const COLORS = [
 export default function TrashTypeTotalChart({ data }: Props) {
   const chartData = data?.map((item) => ({
     name: item.type,
-    value: item.total,
+    value: parseFloat(item.total.toFixed(2)),
   }));
 
   return (

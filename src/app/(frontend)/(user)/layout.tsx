@@ -9,7 +9,7 @@ export default withAuth(
     return children;
   },
   undefined,
-  ["ADMIN", "USER"],
+  ["USER"],
 );
 
 // export default function Layout({

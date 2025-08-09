@@ -24,7 +24,7 @@ export default function Dashboard() {
       method: "get",
       config: { withCredentials: true },
     },
-    immediate: !IS_DEV,
+    immediate: true,
   });
 
   // dev info
@@ -39,8 +39,6 @@ export default function Dashboard() {
 
   const analytics = !IS_DEV ? data : MOCK_ADMIN_DASHBOARD_DATA;
   // const analytics = data;
-
-  console.log(data);
 
   return (
     <RootLayout header={<Navbar />} footer={<Footer />}>

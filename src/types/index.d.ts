@@ -1,4 +1,4 @@
-import { Role, Status, TrashType } from "@/generated/prisma";
+import { BalanceRefType, Role, Status, TrashType } from "@/generated/prisma";
 import { Decimal } from "@/generated/prisma/runtime/library";
 
 export interface Pagination {
@@ -153,3 +153,15 @@ export interface TrashVerifyData {
   };
   signature: string;
 }
+
+// balance
+interface BalanceHistory {
+  id: string;
+  createdAt: Date;
+  amount: Decimal;
+  reason: string;
+  refType: BalanceRefType;
+  refId: string | null;
+}
+
+export type BalanceHistoryData = BalanceHistory[];

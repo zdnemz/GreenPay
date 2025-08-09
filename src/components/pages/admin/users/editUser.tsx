@@ -47,6 +47,7 @@ export function EditUserDialog({ user, onSuccess }: EditUserDialogProps) {
         await fetcher({
           url: `/api/admin/users/${user.id}`,
           method: "put",
+          data,
           config: { withCredentials: true },
         });
 
@@ -72,7 +73,9 @@ export function EditUserDialog({ user, onSuccess }: EditUserDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="secondary">Edit</Button>
+        <Button variant="secondary" className="cursor-pointer">
+          Edit
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

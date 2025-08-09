@@ -50,7 +50,16 @@ function TrashHistoryPage() {
   const user = useAuthUser();
 
   return (
-    <RootLayout header={<SimpleNavbar />} footer={<Footer />}>
+    <RootLayout
+      header={
+        <SimpleNavbar
+          backTo={
+            user?.role === "PETUGAS" ? "/petugas/dashboard" : "/dashboard"
+          }
+        />
+      }
+      footer={<Footer />}
+    >
       <section className="grid space-y-6">
         <div>
           <h3 className="text-2xl font-semibold">Riwayat Transaksi</h3>
