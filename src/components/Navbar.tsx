@@ -119,7 +119,7 @@ export default function Navbar() {
 
         {/* Hamburger (Mobile Only) */}
         <button
-          className="lg:hidden"
+          className="cursor-pointer lg:hidden"
           onClick={() => setIsMenuOpen(true)}
           aria-label="Open menu"
         >
@@ -152,6 +152,7 @@ export default function Navbar() {
 
             {/* Close Action Button */}
             <button
+              className="cursor-pointer"
               onClick={() => setIsMenuOpen(false)}
               aria-label="Close menu"
             >
@@ -256,10 +257,10 @@ function NavbarAction({
             {user?.role === "PETUGAS" && (
               <>
                 <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link href="/petugas">Dashboard</Link>
+                  <Link href="/petugas/dashboard">Dashboard</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link href="/petugas/input">Input Data</Link>
+                  <Link href="/trash/verify">Verifikasi Setoran</Link>
                 </DropdownMenuItem>
               </>
             )}
@@ -389,18 +390,18 @@ function MobileProfileMenu({
       {user?.role === "PETUGAS" && (
         <>
           <Link
-            href="/petugas"
+            href="/petugas/dashboard"
             className="hover:text-primary transition-colors"
             onClick={onClose}
           >
             Dashboard
           </Link>
           <Link
-            href="/petugas/input"
+            href="/trash/verify"
             className="hover:text-primary transition-colors"
             onClick={onClose}
           >
-            Input Data
+            Verifikasi Setoran
           </Link>
         </>
       )}

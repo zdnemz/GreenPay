@@ -5,6 +5,8 @@ import { prepareDepositTrashSchema } from "@/schemas/trash-schema";
 import { generateSignature } from "@/lib/crypto";
 import { NextRequest } from "next/server";
 import { QR_CODE_EXPIRATION } from "@/constants";
+import { nanoid } from "nanoid";
+import { getRedisClient } from "@/lib/redis";
 
 export async function POST(req: NextRequest) {
   try {
@@ -31,11 +33,24 @@ export async function POST(req: NextRequest) {
       expiresAt,
     };
 
-    const signature = generateSignature(qrPayload);
+    const payloadId = nanoid(10);
+
+    // save payload to redis
+    const redis = getRedisClient();
+    await redis.set(
+      payloadId,
+      JSON.stringify(qrPayload),
+      "EX",
+      QR_CODE_EXPIRATION / 1000,
+    ); //expire in 10 minutes
+
+    // generate signature
+    const signature = generateSignature(payloadId);
 
     return response(201, {
-      payload: qrPayload,
+      payloadId,
       signature,
+      expiresAt,
     });
   } catch (error) {
     console.error("Error generate Transaction:", error);

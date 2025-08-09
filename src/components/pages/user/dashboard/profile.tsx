@@ -5,11 +5,14 @@ import Image from "next/image";
 import {
   ChevronDown,
   ChevronUp,
+  Clock,
+  CreditCard,
   Eye,
   EyeOff,
   Info,
   Minus,
   Trophy,
+  Upload,
 } from "lucide-react";
 
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
@@ -26,6 +29,7 @@ import { useFetch } from "@/hooks/useFetch";
 import { UserData } from "@/types";
 import { formatOrdinalNumber } from "@/lib/utils";
 import { useAppActions, useIsBalanceVisible } from "@/stores/app-store";
+import Link from "next/link";
 
 export default function ProfileSection() {
   const { data: user, fetch: refetchUser } = useFetch<UserData>({
@@ -68,18 +72,23 @@ export default function ProfileSection() {
               </div>
 
               <div className="-mt-8 space-y-1 sm:-mt-12 md:-mt-16 lg:mt-0">
-                <div className="flex max-w-full items-center gap-3">
-                  <h2 className="text-primary line-clamp-2 max-w-[12rem] text-xl font-semibold sm:max-w-[16rem] sm:text-2xl">
-                    {user?.name}
-                  </h2>
-                  <div className="bg-muted-foreground h-6 w-px" />
-                  <p className="text-muted-foreground whitespace-nowrap">
-                    {user?.points ?? "-"} pts
+                <div>
+                  <div className="flex max-w-full items-center gap-3">
+                    <h2 className="text-primary line-clamp-2 max-w-[12rem] text-xl font-semibold sm:max-w-[16rem] sm:text-2xl">
+                      {user?.name}
+                    </h2>
+                    <div className="bg-muted-foreground h-6 w-px" />
+                    <p className="text-muted-foreground whitespace-nowrap">
+                      {user?.points ?? "-"} pts
+                    </p>
+                  </div>
+                  <p className="text-muted-foreground text-xs">
+                    {user?.email ?? "-"}
                   </p>
                 </div>
 
                 <div>
-                  <p className="text-muted-foreground flex items-center gap-x-1 text-sm">
+                  <p className="flex items-center gap-x-1 text-sm">
                     Balance saat ini
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -123,7 +132,7 @@ export default function ProfileSection() {
                   </div>
                 </div>
                 <div>
-                  <p className="text-muted-foreground flex items-center gap-x-1 text-sm">
+                  <p className="flex items-center gap-x-1 text-sm">
                     Peringkat anda
                     <Trophy className="h-4 w-4" />
                   </p>
@@ -175,31 +184,53 @@ export default function ProfileSection() {
           </div>
 
           {/* content */}
-          <div className="bg-background w-full space-y-2 rounded-md p-4 sm:space-y-1 sm:p-6">
-            <div>
-              <h3 className="text-sm sm:text-base">User ID</h3>
-              <p className="text-muted-foreground text-xs sm:text-sm">
-                {user?.id ?? "-"}
-              </p>
-            </div>
-            <div>
-              <h3 className="text-sm sm:text-base">Email</h3>
-              <p className="text-muted-foreground text-xs sm:text-sm">
-                {user?.email ?? "-"}
-              </p>
-            </div>
-            <div>
-              <h3 className="text-sm sm:text-base">Dibuat pada</h3>
-              <p className="text-muted-foreground text-xs sm:text-sm">
-                {user?.createdAt
-                  ? new Intl.DateTimeFormat("id-ID", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    }).format(new Date(user.createdAt))
-                  : "-"}
-              </p>
-            </div>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            <Link href="/trash/deposit" passHref>
+              <Card className="hover:border-primary flex h-full cursor-pointer flex-col items-center justify-center gap-2 p-6 transition-all duration-300 hover:shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]">
+                <Upload className="text-primary h-12 w-12" />
+                <h3 className="text-primary text-center text-lg font-semibold">
+                  Setor Sampah
+                </h3>
+                <p className="text-muted-foreground text-center text-sm">
+                  Input data sampah warga untuk verifikasi
+                </p>
+              </Card>
+            </Link>
+
+            <Link href="/trash/history" passHref>
+              <Card className="hover:border-primary flex h-full cursor-pointer flex-col items-center justify-center gap-2 p-6 transition-all duration-300 hover:shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]">
+                <Clock className="text-primary h-12 w-12" />
+                <h3 className="text-primary text-center text-lg font-semibold">
+                  Riwayat Setoran
+                </h3>
+                <p className="text-muted-foreground text-center text-sm">
+                  Melihat riwayat verifikasi dan setoran sampah
+                </p>
+              </Card>
+            </Link>
+
+            <Link href="/balance/history" passHref>
+              <Card className="hover:border-primary flex h-full cursor-pointer flex-col items-center justify-center gap-2 p-6 transition-all duration-300 hover:shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]">
+                <Clock className="text-primary h-12 w-12" />
+                <h3 className="text-primary text-center text-lg font-semibold">
+                  Riwayat Transaksi Balance
+                </h3>
+                <p className="text-muted-foreground text-center text-sm">
+                  Melihat riwayat transaksi saldo pengguna
+                </p>
+              </Card>
+            </Link>
+            <Link href="/withdraw/history" passHref>
+              <Card className="hover:border-primary flex h-full cursor-pointer flex-col items-center justify-center gap-2 p-6 transition-all duration-300 hover:shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]">
+                <CreditCard className="text-primary h-12 w-12" />
+                <h3 className="text-primary text-center text-lg font-semibold">
+                  Withdraw
+                </h3>
+                <p className="text-muted-foreground text-center text-sm">
+                  Proses penarikan saldo pengguna
+                </p>
+              </Card>
+            </Link>
           </div>
         </div>
       </Card>

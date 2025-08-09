@@ -58,9 +58,11 @@ export default function Login() {
         if (data.role === "ADMIN") {
           router.replace("/admin/dashboard");
           return;
-        } else if (data.role === "USER") {
-          router.replace("/dashboard");
+        } else if (data.role === "PETUGAS") {
+          router.replace("/petugas/dashboard");
           return;
+        } else {
+          router.replace("/dashboard");
         }
       } catch (error) {
         console.error("login error:", error);
@@ -72,7 +74,7 @@ export default function Login() {
   return (
     <main className="grid md:grid-cols-2">
       <section className="order-1 md:order-2">
-        <Card className="flex h-screen w-full flex-col justify-center rounded-t-none p-8 shadow-lg md:rounded-l-none md:p-12 lg:p-16">
+        <Card className="flex h-screen w-full flex-col justify-center rounded-none rounded-t-lg p-8 shadow-lg md:rounded-t-none md:rounded-l-lg md:p-12 lg:p-16">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold">Login</CardTitle>
           </CardHeader>
@@ -119,7 +121,7 @@ export default function Login() {
                 />
                 <Button
                   type="submit"
-                  className="w-full cursor-pointer"
+                  className="w-full cursor-pointer bg-[linear-gradient(270deg,var(--chart-1),var(--chart-2),var(--chart-3),var(--chart-4))] bg-[length:200%_200%] shadow transition-all duration-300 hover:shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]"
                   disabled={isPending}
                 >
                   {isPending ? "Loading..." : "Login"}

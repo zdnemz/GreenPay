@@ -9,6 +9,7 @@ import Navbar from "@/components/Navbar";
 import Pagination from "@/components/Pagination";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
+import { withSuspense } from "@/hoc/withSuspense";
 import { usePagination } from "@/hooks/usePagination";
 import { IS_DEV } from "@/lib/config";
 import { MOCK_LEADERBOARD_DATA } from "@/lib/mock";
@@ -17,7 +18,9 @@ import Image from "next/image";
 import * as React from "react";
 import { toast } from "sonner";
 
-export default function Leaderboard() {
+export default withSuspense(Leaderboard);
+
+function Leaderboard() {
   const { data, pagination, handlePageChange } = usePagination<LeaderboardData>(
     {
       apiEndpoint: "/api/leaderboard",

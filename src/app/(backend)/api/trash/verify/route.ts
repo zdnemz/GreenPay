@@ -5,6 +5,8 @@ import { db } from "@/lib/db";
 import { NextRequest } from "next/server";
 import { validate } from "@/lib/validate";
 import { verifyDepositTrashSchema } from "@/schemas/trash-schema";
+import { getRedisClient } from "@/lib/redis";
+import { TrashPayload } from "@/types";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,10 +21,17 @@ export async function POST(req: NextRequest) {
     const validated = await validate(verifyDepositTrashSchema, data);
     if (!validated.success) return response(400, validated.error);
 
-    const { payload, signature } = validated.data;
+    const { payloadId, signature } = validated.data;
+
+    // get payload from redis by payloadId
+    const redis = getRedisClient();
+    const payloadJSON = await redis.get(payloadId);
+    if (!payloadJSON) return response(400, "QR code sudah kedaluwarsa");
+
+    const payload: TrashPayload = JSON.parse(payloadJSON);
 
     // Validasi signature
-    const isValid = verifySignature(payload, signature);
+    const isValid = verifySignature(payloadId, signature);
     if (!isValid) return response(400, "QR signature tidak valid");
 
     // Cek timestamp
@@ -40,7 +49,10 @@ export async function POST(req: NextRequest) {
     }
 
     return response(200, {
-      payload,
+      payload: {
+        payloadId,
+        ...payload,
+      },
       signature,
     });
   } catch (error) {

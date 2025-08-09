@@ -66,7 +66,7 @@ export default function Register() {
   return (
     <main className="grid md:grid-cols-2">
       <section className="order-2 md:order-1">
-        <Card className="flex h-screen w-full flex-col justify-center rounded-t-none p-8 shadow-lg md:rounded-l-none md:p-12 lg:p-16">
+        <Card className="flex h-screen w-full flex-col justify-center rounded-none rounded-t-lg p-8 shadow-lg md:rounded-t-none md:rounded-r-lg md:p-12 lg:p-16">
           <CardHeader className="text-center">
             <CardTitle className="text-3xl font-bold">Daftar Akun</CardTitle>
           </CardHeader>
@@ -148,7 +148,7 @@ export default function Register() {
                 />
                 <Button
                   type="submit"
-                  className="w-full cursor-pointer"
+                  className="w-full cursor-pointer bg-[linear-gradient(270deg,var(--chart-1),var(--chart-2),var(--chart-3),var(--chart-4))] bg-[length:200%_200%] shadow transition-all duration-300 hover:shadow-[0_0_10px_4px_rgba(166,255,0,0.4)]"
                   disabled={isPending}
                 >
                   {isPending ? "Loading..." : "register"}

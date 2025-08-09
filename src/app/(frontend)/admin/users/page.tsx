@@ -19,8 +19,11 @@ import { DeleteUserDialog } from "@/components/pages/admin/users/deleteUser";
 import Pagination from "@/components/Pagination";
 import { Input } from "@/components/ui/input";
 import { useSearch } from "@/hooks/useSearch";
+import { withSuspense } from "@/hoc/withSuspense";
 
-export default function Users() {
+export default withSuspense(Users);
+
+function Users() {
   const {
     data: users,
     pagination,

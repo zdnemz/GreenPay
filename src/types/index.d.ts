@@ -81,16 +81,15 @@ export interface AdminUserData {
 
 // ======================== interface Trash routes ========================
 export interface TrashPrepareData {
-  payload: {
-    userId: string;
-    trash: {
-      trashType: TrashType;
-      weight: number;
-    }[];
-    timestamp: number;
-    expiresAt: number;
-  };
+  payloadId: string;
   signature: string;
+  expiresAt: number;
+}
+
+export interface TrashItem {
+  trashType: TrashType;
+  weight: number;
+  points: number;
 }
 
 interface TrashHistory {
@@ -98,15 +97,15 @@ interface TrashHistory {
   signature: string;
   id: string;
   createdAt: Date;
+  user: {
+    name: string;
+    id: string;
+  };
   petugas: {
     name: string;
     id: string;
   } | null;
-  items: {
-    trashType: TrashType;
-    weight: number;
-    points: number;
-  }[];
+  items: TrashItem[];
 }
 
 export type TrashHistoryData = TrashHistory[];
@@ -125,10 +124,20 @@ export interface TrashSubmitData {
     weight: number;
     id: string;
     points: number;
-    trashTrashId: string;
+    trashDepositId: string;
   }[];
   totalPoints: number;
   totalWeight: number;
+}
+
+export interface TrashPayload {
+  userId: string;
+  trash: {
+    trashType: TrashType;
+    weight: number;
+  }[];
+  timestamp: number;
+  expiresAt: number;
 }
 
 export interface TrashVerifyData {
@@ -140,6 +149,7 @@ export interface TrashVerifyData {
     }[];
     timestamp: number;
     expiresAt: number;
+    payloadId: string;
   };
   signature: string;
 }

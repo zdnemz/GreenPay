@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { getUserFromSession } from "@/lib/session";
 import { response } from "@/lib/response";
 import { Role, Status } from "@/generated/prisma/client";
+import { convertBigInt } from "@/lib/utils";
 
 export async function GET() {
   try {
@@ -61,14 +62,17 @@ export async function GET() {
       total: item._sum.weight ?? 0,
     }));
 
-    return response(200, {
-      totalUser,
-      totalPetugas,
-      totalTransaksi,
-      totalSampah,
-      transaksiPerBulan,
-      transaksiStatus,
-    });
+    return response(
+      200,
+      convertBigInt({
+        totalUser,
+        totalPetugas,
+        totalTransaksi,
+        totalSampah,
+        transaksiPerBulan,
+        transaksiStatus,
+      }),
+    );
   } catch (err) {
     console.error("Error GET /admin/analytics:", err);
     return response(500, "Gagal memuat statistik");

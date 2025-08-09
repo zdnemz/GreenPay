@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import RootLayout from "@/components/layouts/RootLayout";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { toast } from "sonner";
 import { fetcher } from "@/lib/fetcher";
@@ -15,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import SimpleNavbar from "@/components/SimpleNavbar";
 
 export default function Update() {
   const [isPending, startTransition] = React.useTransition();
@@ -36,7 +36,7 @@ export default function Update() {
   }
 
   return (
-    <RootLayout header={<Navbar />} footer={<Footer />}>
+    <RootLayout header={<SimpleNavbar />} footer={<Footer />}>
       <section className="space-y-6 py-6">
         <div className="space-y-1 text-center">
           <h1 className="text-3xl font-bold tracking-tight">

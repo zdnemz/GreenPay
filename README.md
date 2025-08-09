@@ -15,7 +15,7 @@
 - ♻️ **Trash-to-Balance Exchange** – Convert your recyclable waste into digital points.
 - 💳 **Digital Wallet Integration** – Points can be stored as balance for future use.
 - 🏆 **Leaderboard & Rewards** – Compete with others and earn achievements.
-- 🔐 **Secure & Scalable** – Powered by **Next.js 15**, **Supabase**, and **Tailwind CSS**.
+- 🔐 **Secure & Scalable** – Powered by **Next.js 15**, **Supabase**, **Redis**, and **Tailwind CSS**.
 
 ---
 

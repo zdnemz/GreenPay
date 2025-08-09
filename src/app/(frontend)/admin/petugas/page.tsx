@@ -20,8 +20,11 @@ import { AddPetugasDialog } from "@/components/pages/admin/petugas/addPetugas";
 import Pagination from "@/components/Pagination";
 import { Input } from "@/components/ui/input";
 import { useSearch } from "@/hooks/useSearch";
+import { withSuspense } from "@/hoc/withSuspense";
 
-export default function Petugas() {
+export default withSuspense(Petugas);
+
+function Petugas() {
   const {
     data: petugas,
     pagination,

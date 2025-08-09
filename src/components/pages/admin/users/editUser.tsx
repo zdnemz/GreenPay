@@ -23,13 +23,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { fetcher } from "@/lib/fetcher";
 
 interface EditUserDialogProps {
@@ -43,7 +36,6 @@ export function EditUserDialog({ user, onSuccess }: EditUserDialogProps) {
     defaultValues: {
       name: user.name,
       email: user.email,
-      role: user.role,
     },
   });
 
@@ -73,7 +65,6 @@ export function EditUserDialog({ user, onSuccess }: EditUserDialogProps) {
       form.reset({
         name: user.name,
         email: user.email,
-        role: user.role,
       });
     }
   }, [open, user, form]);
@@ -120,32 +111,6 @@ export function EditUserDialog({ user, onSuccess }: EditUserDialogProps) {
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Role</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    disabled={isPending}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="focus-visible:ring-primary w-full">
-                        <SelectValue placeholder="Pilih role" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="ADMIN">Admin</SelectItem>
-                      <SelectItem value="PETUGAS">Petugas</SelectItem>
-                      <SelectItem value="USER">User</SelectItem>
-                    </SelectContent>
-                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

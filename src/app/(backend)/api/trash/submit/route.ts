@@ -4,7 +4,7 @@ import { verifySignature } from "@/lib/crypto";
 import { db } from "@/lib/db";
 import { NextRequest } from "next/server";
 import { validate } from "@/lib/validate";
-import { verifyDepositTrashSchema } from "@/schemas/trash-schema";
+import { submitDepositTrashSchema } from "@/schemas/trash-schema";
 import { calculatePoints, pointsToBalance } from "@/lib/points";
 import { Status } from "@/generated/prisma/client";
 
@@ -18,20 +18,14 @@ export async function POST(req: NextRequest) {
 
     const data = await req.json();
 
-    const validated = await validate(verifyDepositTrashSchema, data);
+    const validated = await validate(submitDepositTrashSchema, data);
     if (!validated.success) return response(400, validated.error);
 
-    const { payload, signature, status } = validated.data;
+    const { payloadId, userId, trash, signature, status } = validated.data;
 
     // Validasi signature
-    const isValid = verifySignature(payload, signature);
-    if (!isValid) return response(400, "QR signature tidak valid");
-
-    // Validasi waktu kedaluwarsa
-    const now = Date.now();
-    if (now > payload.expiresAt) {
-      return response(400, "QR code sudah kedaluwarsa");
-    }
+    const isValid = verifySignature(payloadId, signature);
+    if (!isValid) return response(400, "signature tidak valid");
 
     // Cek apakah QR code sudah digunakan
     const existing = await db.trashDeposit.findFirst({ where: { signature } });
@@ -41,7 +35,7 @@ export async function POST(req: NextRequest) {
     let points = 0;
     let weight = 0;
 
-    const trashData = payload.trash.map((v) => {
+    const trashData = trash.map((v) => {
       const currentPoint = calculatePoints(v.trashType, v.weight);
       points += currentPoint;
       weight += v.weight;
@@ -55,7 +49,7 @@ export async function POST(req: NextRequest) {
 
     const transaction = await db.trashDeposit.create({
       data: {
-        userId: payload.userId,
+        userId: userId,
         petugasId: sessionUser.id,
         signature,
         status: status as Status,
@@ -76,7 +70,7 @@ export async function POST(req: NextRequest) {
       const balance = pointsToBalance(points);
 
       await db.user.update({
-        where: { id: payload.userId },
+        where: { id: userId },
         data: {
           points: { increment: points },
           balance: { increment: balance },
@@ -86,7 +80,7 @@ export async function POST(req: NextRequest) {
       // Buat catatan transaksi saldo (jika dibutuhkan)
       await db.balanceTransaction.create({
         data: {
-          userId: payload.userId,
+          userId: userId,
           amount: balance,
           reason: "Setor sampah",
           refType: "REWARD",

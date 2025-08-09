@@ -7,8 +7,8 @@ import { getUserFromSession } from "@/lib/session";
 export async function GET(req: NextRequest) {
   try {
     const session = await getUserFromSession();
-    if (!session || session.role !== "USER") {
-      return response(401, "Hanya user yang dapat mengakses endpoint ini");
+    if (!session) {
+      return response(401, "Anda tidak memiliki mengakses endpoint ini");
     }
 
     const { searchParams } = new URL(req.url);
@@ -22,18 +22,18 @@ export async function GET(req: NextRequest) {
 
     const skip = (page - 1) * limit;
 
+    const whereClause = {
+      ...(session.role === "USER" && { userId: session.id }),
+      ...(session.role === "PETUGAS" && { petugasId: session.id }),
+      ...(status && { status }),
+    };
+
     const total = await db.trashDeposit.count({
-      where: {
-        userId: session.id,
-        ...(status && { status }),
-      },
+      where: whereClause,
     });
 
     const transactions = await db.trashDeposit.findMany({
-      where: {
-        userId: session.id,
-        ...(status && { status }),
-      },
+      where: whereClause,
       orderBy: {
         createdAt: sort === "asc" ? "asc" : "desc",
       },
@@ -44,6 +44,12 @@ export async function GET(req: NextRequest) {
         createdAt: true,
         status: true,
         signature: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         petugas: {
           select: {
             id: true,

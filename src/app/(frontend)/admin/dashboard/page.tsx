@@ -38,6 +38,9 @@ export default function Dashboard() {
   }, []);
 
   const analytics = !IS_DEV ? data : MOCK_ADMIN_DASHBOARD_DATA;
+  // const analytics = data;
+
+  console.log(data);
 
   return (
     <RootLayout header={<Navbar />} footer={<Footer />}>
