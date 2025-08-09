@@ -24,6 +24,7 @@
 - **Frontend**: [Next.js 15](https://nextjs.org/) + [Tailwind CSS](https://tailwindcss.com/)
 - **Backend & Auth**: [Supabase](https://supabase.com/)
 - **Database**: Supabase PostgreSQL
+- **Caching & Session Management**: **Redis** (used for caching QR code validations and improving system performance)
 - **Other Tools**: QR Code validation, leaderboard
 
 ---
@@ -58,16 +59,10 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
 - [x] Project Initialization
 - [x] Supabase setup & database schema
-- [ ] User authentication & QR Code validation
-- [ ] Wallet & transaction system
-- [ ] Leaderboard & reward system
+- [x] User authentication & QR Code validation
+- [x] Wallet & transaction system
+- [x] Leaderboard & reward system
 - [ ] Final polish & presentation
-
----
-
-## 🤝 **Contributing**
-
-Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
 
 ---
 
