@@ -138,7 +138,7 @@ function TrashHistoryPage() {
                           : (tx.petugas?.name ?? "-")}
                       </TableCell>
                       <TableCell>{jenisSampah}</TableCell>
-                      <TableCell>{totalBerat}</TableCell>
+                      <TableCell>{totalBerat.toFixed(2)}</TableCell>
                       <TableCell>{totalPoin}</TableCell>
                       <TableCell>
                         <Badge

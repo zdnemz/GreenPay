@@ -7,6 +7,7 @@ import { NextRequest } from "next/server";
 import { QR_CODE_EXPIRATION } from "@/constants";
 import { nanoid } from "nanoid";
 import { getRedisClient } from "@/lib/redis";
+import { TrashPayload } from "@/types";
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,8 +27,11 @@ export async function POST(req: NextRequest) {
     const timestamp = Date.now();
     const expiresAt = timestamp + QR_CODE_EXPIRATION;
 
-    const qrPayload = {
-      userId: sessionUser.id,
+    const qrPayload: TrashPayload = {
+      user: {
+        id: sessionUser.id,
+        name: sessionUser.name,
+      },
       trash,
       timestamp,
       expiresAt,

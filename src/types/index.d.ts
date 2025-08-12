@@ -131,7 +131,10 @@ export interface TrashSubmitData {
 }
 
 export interface TrashPayload {
-  userId: string;
+  user: {
+    id: string;
+    name: string;
+  };
   trash: {
     trashType: TrashType;
     weight: number;
@@ -142,7 +145,10 @@ export interface TrashPayload {
 
 export interface TrashVerifyData {
   payload: {
-    userId: string;
+    user: {
+      id: string;
+      name: string;
+    };
     trash: {
       trashType: TrashType;
       weight: number;

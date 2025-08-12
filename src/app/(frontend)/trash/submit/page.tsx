@@ -55,11 +55,13 @@ function TrashSubmitPage() {
     redirect("/trash/verify");
   }
 
+  console.log(QRData);
+
   const form = useForm<z.infer<typeof submitDepositTrashSchema>>({
     resolver: zodResolver(submitDepositTrashSchema),
     defaultValues: {
       payloadId: QRData.payload.payloadId,
-      userId: QRData.payload.userId,
+      userId: QRData.payload.user.id,
       signature: QRData.signature,
       trash: QRData.payload.trash.length
         ? QRData.payload.trash.map((item) => ({
@@ -89,11 +91,15 @@ function TrashSubmitPage() {
 
         if (!data) throw new Error("Response data kosong");
 
-        toast.success("Transaksi berhasil dibuat", {
-          description: `${data.totalPoints} poin, ${data.totalWeight.toFixed(
-            2,
-          )} kg sampah terkumpul`,
-        });
+        if (data.status === "APPROVED") {
+          toast.success("Transaksi disetujui", {
+            description: `Berhasil mendapatkan ${data.totalPoints} poin dari ${data.totalWeight.toFixed(2)} kg sampah`,
+          });
+        } else if (data.status === "REJECTED") {
+          toast.error("Transaksi ditolak", {
+            description: `${data.totalWeight.toFixed(2)} kg sampah tidak memenuhi kriteria`,
+          });
+        }
 
         router.push("/trash/history");
       } catch (error) {
@@ -115,9 +121,14 @@ function TrashSubmitPage() {
   return (
     <RootLayout header={<SimpleNavbar />}>
       <section className="flex min-h-screen w-full items-center justify-center">
-        <Card className="mx-auto max-w-2xl min-w-96 space-y-3 p-6">
+        <Card className="mx-auto max-w-2xl min-w-96 p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold">Konfirmasi Setor Sampah</h2>
+            <div>
+              <h2 className="text-xl font-semibold">Konfirmasi Setor Sampah</h2>
+              <p className="text-muted-foreground">
+                {QRData.payload.user.name}
+              </p>
+            </div>
           </div>
 
           <Separator />
